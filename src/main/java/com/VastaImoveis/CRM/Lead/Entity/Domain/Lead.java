@@ -2,6 +2,7 @@ package com.VastaImoveis.CRM.Lead.Entity.Domain;
 
 import com.VastaImoveis.CRM.LeadNotes.Entity.domain.LeadNote;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +40,7 @@ public class Lead {
     private User user;
 
     @OneToMany(mappedBy = "lead", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<LeadNote> notes;
 
     public void setUpdatedAt(LocalDateTime updatedAt) {

@@ -1,22 +1,19 @@
-package com.VastaImoveis.CRM.Alert.entity.domain;
+package com.VastaImoveis.CRM.Reminder.entity.domain;
 
 import com.VastaImoveis.CRM.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-public class Alert {
+public class Reminder {
 
     @Id
     @GeneratedValue
     private UUID id;
-
-    private String title;
-
-    private String message;
 
     private Boolean read = false;
 
@@ -25,20 +22,18 @@ public class Alert {
     private LocalDateTime alarmAt;
 
     @ManyToOne
+    @JsonIgnore
     private Lead lead;
 
     @ManyToOne
+    @JsonIgnore
     private User user;
 
-    private AlertType type;
+    public Reminder(){}
 
-    public Alert(String title, String message, AlertType type, LocalDateTime alarmAt) {
-        this.title = title;
-        this.message = message;
-        this.type = type;
+    public Reminder(LocalDateTime alarmAt) {
         this.alarmAt = alarmAt;
     }
-
     @PrePersist
     public void PrePersist(){
         this.createdAt = LocalDateTime.now();
@@ -50,22 +45,6 @@ public class Alert {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public Boolean getRead() {
@@ -98,14 +77,6 @@ public class Alert {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public AlertType getType() {
-        return type;
-    }
-
-    public void setType(AlertType type) {
-        this.type = type;
     }
 
     public LocalDateTime getAlarmAt() {

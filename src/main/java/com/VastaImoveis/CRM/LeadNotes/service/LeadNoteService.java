@@ -49,7 +49,7 @@ public class LeadNoteService {
     }
 
     public Page<LeadNoteResponseDTO> findByLeadId(UUID id, Pageable pageable){
-        return repository.findByLeadId(id, pageable).map(LeadNoteMapper::toDTO);
+        return repository.findByLeadIdOrderByCreatedAtDesc(id, pageable).map(LeadNoteMapper::toDTO);
     }
 
     //Buscar por ID

@@ -22,7 +22,7 @@ public interface LeadNoteRepository extends JpaRepository<LeadNote, UUID> {
 
     List<LeadNote> findByLeadIdOrderByCreatedAtAsc(UUID leadId);
 
-    Page<LeadNote> findByLeadId(UUID leadId, Pageable pageable);
+    Page<LeadNote> findByLeadIdOrderByCreatedAtDesc(UUID leadId, Pageable pageable);
 
     @Query("""
     SELECT ln.lead.id

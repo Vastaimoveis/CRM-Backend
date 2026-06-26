@@ -31,7 +31,7 @@ public class CrmApplication {
 
         return args -> {
 
-            if (!repo.existsByEmail("admin@crm.com")) {
+            if (!repo.existsByEmail(adminEmail)) {
 
                 User user = new User();
 

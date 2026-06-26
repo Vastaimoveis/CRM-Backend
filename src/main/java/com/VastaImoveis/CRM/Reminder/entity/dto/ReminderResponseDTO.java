@@ -1,33 +1,27 @@
-package com.VastaImoveis.CRM.Alert.entity.dto;
+package com.VastaImoveis.CRM.Reminder.entity.dto;
 
-import com.VastaImoveis.CRM.Alert.entity.domain.AlertType;
+import com.VastaImoveis.CRM.Reminder.entity.domain.ReminderType;
 import com.VastaImoveis.CRM.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class AlertResponseDTO {
+public class ReminderResponseDTO {
 
     private final UUID id;
     private final Lead lead;
     private final User user;
     private final LocalDateTime createdAt;
     private final LocalDateTime alarmAt;
-    private final String title;
-    private final String message;
-    private final AlertType type;
     private final Boolean read;
 
-    public AlertResponseDTO(UUID id, Lead lead, User user, LocalDateTime createdAt, LocalDateTime alarmAt, String title, String message, AlertType type, Boolean read) {
+    public ReminderResponseDTO(UUID id, Lead lead, User user, LocalDateTime createdAt, LocalDateTime alarmAt, Boolean read) {
         this.id = id;
         this.lead = lead;
         this.user = user;
         this.createdAt = createdAt;
         this.alarmAt = alarmAt;
-        this.title = title;
-        this.message = message;
-        this.type = type;
         this.read = read;
     }
 
@@ -49,18 +43,6 @@ public class AlertResponseDTO {
 
     public LocalDateTime getAlarmAt() {
         return alarmAt;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public AlertType getType() {
-        return type;
     }
 
     public Boolean getRead() {
