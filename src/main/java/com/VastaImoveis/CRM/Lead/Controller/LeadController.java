@@ -126,11 +126,11 @@ public class LeadController {
 
     @GetMapping("/filter")
     public ResponseEntity<ApiResponse<Page<LeadResponseDTO>>> filter(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) StatusLead status,
-            @RequestParam(required = false) UUID userId,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "status", required = false) StatusLead status,
+            @RequestParam(name = "userId", required = false) UUID userId,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) LocalDate endDate,
             @PageableDefault(size=15) Pageable pageable
     ) {
         return ResponseEntity.ok(
