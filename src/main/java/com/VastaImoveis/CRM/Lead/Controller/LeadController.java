@@ -115,20 +115,21 @@ public class LeadController {
     }
 
     // Buscar em dashboard
-    @GetMapping("/dashboard")
+    @GetMapping("/dashboard/{id}")
     @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
-    public ResponseEntity<ApiResponse<LeadDashboardDTO>> dashboard() {
+    public ResponseEntity<ApiResponse<LeadDashboardDTO>> dashboard(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                    new ApiResponse<>(true, service.getDashboard(), "Dashboard buscado com sucesso")
+                    new ApiResponse<>(true, service.getDashboard(id), "Dashboard buscado com sucesso")
         );
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
     public ResponseEntity<ApiResponse<Page<LeadResponseDTO>>> filter(
             @RequestParam(name = "search", required = false) String search,
             @RequestParam(name = "status", required = false) StatusLead status,
-            @RequestParam(name = "userId", required = false) UUID userId,
+            @RequestParam(name = "userid", required = false) UUID userId,
             @RequestParam(name = "startDate", required = false) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) LocalDate endDate,
             @PageableDefault(size=15) Pageable pageable
@@ -149,12 +150,12 @@ public class LeadController {
         );
     }
 
-    @GetMapping("/oportunidades")
-    public ResponseEntity<ApiResponse<List<LeadResponseDTO>>> getOportunidades() {
+    @GetMapping("/oportunidades/{id}")
+    public ResponseEntity<ApiResponse<List<LeadResponseDTO>>> getOportunidades(@PathVariable UUID id) {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                        new ApiResponse<>(true, service.findOportunidades(), "Dashboard buscado com sucesso")
+                        new ApiResponse<>(true, service.findOportunidades(id), "Dashboard buscado com sucesso")
                 );
     }
 

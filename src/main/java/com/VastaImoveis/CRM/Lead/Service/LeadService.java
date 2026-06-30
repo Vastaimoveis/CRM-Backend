@@ -11,6 +11,7 @@ import com.VastaImoveis.CRM.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.Lead.mapper.LeadMapper;
 import com.VastaImoveis.CRM.LeadNotes.repository.LeadNoteRepository;
 import com.VastaImoveis.CRM.Users.Entity.Domain.RoleUsers;
+import com.VastaImoveis.CRM.Users.Repository.UserRepository;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,9 +29,11 @@ public class LeadService {
 
     private final LeadRepository repository;
     private final LeadNoteRepository leadNoteRepository;
-    public LeadService(LeadRepository repository, LeadNoteRepository leadNoteRepository) {
+    private final UserRepository userRepository;
+    public LeadService(LeadRepository repository, LeadNoteRepository leadNoteRepository, UserRepository userRepository) {
         this.repository = repository;
         this.leadNoteRepository = leadNoteRepository;
+        this.userRepository = userRepository;
     }
 
     public LeadResponseDTO create(LeadRequestDTO dto) {
@@ -144,8 +148,13 @@ public class LeadService {
                         : LocalDateTime.of(2999,12,31,23,59);
 
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("Erro ao buscar usuário no filter"));
+
+        boolean isGerente = user.getRole().name().equals("GERENTE");
+
         Page<Lead> page = repository
-                .filter(search, status, userId, start, end, pageable);
+                .filter(search, status, isGerente ? null : userId, start, end, pageable);
         List<UUID> listIds = page.getContent()
                 .stream()
                 .map(Lead::getId)
@@ -163,10 +172,10 @@ public class LeadService {
         );
     }
 
-    public List<LeadResponseDTO> findOportunidades() {
+    public List<LeadResponseDTO> findOportunidades(UUID id) {
 
-        User user = SecurityUtils.getCurrentUser();
-
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado em findOportunidades"));
         List<StatusLead> statusPermitidos = List.of(
                 StatusLead.ATENDIMENTO,
                 StatusLead.AGUARDANDO,
@@ -177,7 +186,7 @@ public class LeadService {
 
         List<Lead> leads;
 
-        if(user.getRole() == RoleUsers.GERENTE){
+        if(user.getRole().name().equals("GERENTE")){
             leads = repository.findByStatusIn(statusPermitidos);
         } else {
             leads = repository.findByStatusInAndUserId(
@@ -270,12 +279,12 @@ public class LeadService {
     }
 
 
-    public LeadDashboardDTO getDashboard() {
+    public LeadDashboardDTO getDashboard(UUID id) {
 
-        User user = SecurityUtils.getCurrentUser();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("User não encontrado no dashboard"));;
 
         boolean isGerente = user.getRole().name().equals("GERENTE");
-
         // 👇 null = todos os leads
         List<StatusCount> result = repository.countByStatus(isGerente ? null : user);
 
