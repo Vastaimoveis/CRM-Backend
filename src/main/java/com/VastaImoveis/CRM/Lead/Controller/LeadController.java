@@ -1,10 +1,7 @@
 package com.VastaImoveis.CRM.Lead.Controller;
 
 import com.VastaImoveis.CRM.Lead.Entity.Domain.StatusLead;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadDashboardDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadRequestDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadResponseDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadStatusDTO;
+import com.VastaImoveis.CRM.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.Lead.Service.LeadService;
 import com.VastaImoveis.CRM.shared.utils.ApiResponse;
 import jakarta.validation.Valid;
@@ -191,6 +188,17 @@ public class LeadController {
     ){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, service.patchLeadStatus(id, status.statusLead()), "Status atualizado com sucesso")
+        );
+    }
+
+    @PatchMapping("/{id}/corretor")
+    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
+    public ResponseEntity<ApiResponse<LeadResponseDTO>> patchCorretor(
+            @PathVariable UUID id,
+            @RequestBody @Valid LeadCorretorDTO corretorDTO
+            ){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ApiResponse<>(true, service.patchLeadCorretor(id, corretorDTO.userId()), "Corretor atualizado com sucesso")
         );
     }
 

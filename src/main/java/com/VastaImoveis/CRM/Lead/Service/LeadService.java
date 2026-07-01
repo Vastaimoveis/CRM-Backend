@@ -258,8 +258,23 @@ public class LeadService {
 
     public LeadResponseDTO patchLeadStatus(UUID id, StatusLead status){
         Lead lead = repository.findById(id)
-                .orElseThrow(() -> new BusinessException("Lead não encontrado"));
+                .orElseThrow(() -> new BusinessException("Lead não encontrado em patch Status"));
         lead.setStatus(status);
+        Lead patched = repository.save(lead);
+        return LeadMapper.toDTO(patched);
+    }
+
+    public LeadResponseDTO patchLeadCorretor(UUID leadId, UUID userId){
+        User userLogged = SecurityUtils.getCurrentUser();
+        boolean isGerente = userLogged.getRole().name().equals("GERENTE");
+        if(!isGerente){
+            throw new BusinessException("Você não tem permissão para alterar essa informação");
+        }
+        Lead lead = repository.findById(leadId)
+                .orElseThrow(() -> new BusinessException("Lead não encontrado em patch corretor"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("user não encontrado em patch corretor"));
+
+        lead.setUser(user);
         Lead patched = repository.save(lead);
         return LeadMapper.toDTO(patched);
     }
