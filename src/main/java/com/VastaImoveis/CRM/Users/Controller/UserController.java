@@ -43,18 +43,18 @@ public class UserController {
             @RequestBody @Valid UserRequestDTO dto
     ) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                new ApiResponse<>(true, service.update(id, dto), "User listado com sucesso"));
+                new ApiResponse<>(true, service.update(id, dto), "User alterado com sucesso"));
     }
 
     @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponseDTO>> findById(UUID id){
+    public ResponseEntity<ApiResponse<UserResponseDTO>> findById(@PathVariable UUID id){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, service.findById(id), "User encontrado com sucesso"));
     }
 
     @PreAuthorize("hasAnyRole('GERENTE')")
-    @GetMapping("/{Regiao}")
+    @GetMapping("/regiao/{Regiao}")
     public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findByRegiao(@PathVariable("Regiao") RegiaoUsers regiaoUsers, Pageable pageable){
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(

@@ -29,6 +29,10 @@ public class Lead {
     @Column(nullable = false)
     private StatusLead status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrigemLead origem;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -123,5 +127,13 @@ public class Lead {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public OrigemLead getOrigem() {
+        return origem;
+    }
+
+    public void setOrigem(OrigemLead origem) {
+        this.origem = origem;
     }
 }

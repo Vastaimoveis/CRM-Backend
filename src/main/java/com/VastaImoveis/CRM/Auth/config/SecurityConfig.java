@@ -25,6 +25,9 @@ public class SecurityConfig {
     @Value("${FRONTEND_URL}")
     private String frontendUrl;
 
+    @Value("${VASTAIMOVEIS_SITE}")
+    private String VastaImoveisSite;
+
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
@@ -45,6 +48,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/leads/public")
+                        .permitAll()
+
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -72,6 +78,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 frontendUrl,
                 "http://localhost:*",
+                VastaImoveisSite,
                 "https://*.vercel.app"
         ));
 

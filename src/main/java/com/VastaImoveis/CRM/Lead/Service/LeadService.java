@@ -3,10 +3,7 @@ package com.VastaImoveis.CRM.Lead.Service;
 import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.Lead.Entity.Domain.StatusLead;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadDashboardDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadRequestDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.LeadResponseDTO;
-import com.VastaImoveis.CRM.Lead.Entity.dto.StatusCount;
+import com.VastaImoveis.CRM.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.Lead.mapper.LeadMapper;
 import com.VastaImoveis.CRM.LeadNotes.repository.LeadNoteRepository;
@@ -46,9 +43,8 @@ public class LeadService {
         lead.setUser(user);
         Lead saved = repository.save(lead);
         return LeadMapper.toDTO(saved);
-
-
     }
+
 
     public Page<LeadResponseDTO> findAllWithPage(Pageable pageable) {
 

@@ -1,8 +1,10 @@
 package com.VastaImoveis.CRM.Lead.Entity.dto;
 
+import com.VastaImoveis.CRM.Lead.Entity.Domain.OrigemLead;
 import com.VastaImoveis.CRM.Lead.Entity.Domain.StatusLead;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
@@ -21,7 +23,17 @@ public class LeadRequestDTO {
 
     private StatusLead status;
 
+    @NotNull(message = "Origem é obrigatória")
+    private OrigemLead origem;
+
     // Getters e Setters
+    public OrigemLead getOrigem() {
+        return origem;
+    }
+
+    public void setOrigem(OrigemLead origem) {
+        this.origem = origem;
+    }
 
     public String getNome() {
         return nome;

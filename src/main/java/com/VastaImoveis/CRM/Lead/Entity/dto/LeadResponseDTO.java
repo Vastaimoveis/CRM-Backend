@@ -1,5 +1,6 @@
 package com.VastaImoveis.CRM.Lead.Entity.dto;
 
+import com.VastaImoveis.CRM.Lead.Entity.Domain.OrigemLead;
 import com.VastaImoveis.CRM.Lead.Entity.Domain.StatusLead;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class LeadResponseDTO {
     private boolean hasNotes;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private final OrigemLead origem;
 
     public boolean isHasNotes() {
         return hasNotes;
@@ -27,7 +29,8 @@ public class LeadResponseDTO {
 
     public LeadResponseDTO(UUID id, UUID userId, String nome, String telefone, String email,
                            StatusLead status,
-                           LocalDateTime createdAt, LocalDateTime updatedAt) {
+                           LocalDateTime createdAt, LocalDateTime updatedAt,
+                            OrigemLead origem) {
         this.id = id;
         this.userId = userId;
         this.nome = nome;
@@ -36,6 +39,7 @@ public class LeadResponseDTO {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.origem = origem;
     }
 
     // Getters
@@ -44,6 +48,10 @@ public class LeadResponseDTO {
     }
     public UUID getId() {
         return id;
+    }
+
+    public OrigemLead getOrigem() {
+        return origem;
     }
 
     public String getNome() {
