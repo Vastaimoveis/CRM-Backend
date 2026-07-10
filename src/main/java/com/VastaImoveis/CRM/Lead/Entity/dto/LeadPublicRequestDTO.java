@@ -6,13 +6,25 @@ public class LeadPublicRequestDTO {
     private String nome;
     private String telefone;
     private String rendaMedia;
+    private String empreendimento;
     private OrigemLead origem;
 
-    public LeadPublicRequestDTO(String nome, String telefone, String rendaMedia, OrigemLead origem) {
+    public LeadPublicRequestDTO(String nome, String telefone, String rendaMedia, String empreendimento, OrigemLead origem) {
         this.nome = nome;
         this.telefone = telefone;
         this.rendaMedia = rendaMedia;
+        this.empreendimento = empreendimento;
         this.origem = origem;
+    }
+
+    public LeadPublicRequestDTO(){};
+
+    public String getEmpreendimento() {
+        return empreendimento;
+    }
+
+    public void setEmpreendimento(String empreendimento) {
+        this.empreendimento = empreendimento;
     }
 
     public String getNome() {

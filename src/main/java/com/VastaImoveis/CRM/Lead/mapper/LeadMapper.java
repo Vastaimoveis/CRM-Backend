@@ -43,6 +43,7 @@ public class LeadMapper {
         Lead lead = new Lead();
         lead.setNome(dto.getNome());
         lead.setTelefone(dto.getTelefone());
+        lead.setOrigem(dto.getOrigem());
         return lead;
     }
 }

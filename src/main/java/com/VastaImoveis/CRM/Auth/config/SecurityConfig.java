@@ -1,5 +1,6 @@
 package com.VastaImoveis.CRM.Auth.config;
 
+import com.VastaImoveis.CRM.Auth.Buckets.RateLimitFilter;
 import com.VastaImoveis.CRM.Auth.Jwt.JwtFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
 
     @Value("${FRONTEND_URL}")
     private String frontendUrl;
@@ -28,8 +30,11 @@ public class SecurityConfig {
     @Value("${VASTAIMOVEIS_SITE}")
     private String VastaImoveisSite;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter,
+                          RateLimitFilter rateLimitFilter
+    ) {
         this.jwtFilter = jwtFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -41,6 +46,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        rateLimitFilter,
+                        JwtFilter.class
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                 })
@@ -48,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/leads/public")
+                        .requestMatchers(HttpMethod.POST, "/public/leads")
                         .permitAll()
 
                         .requestMatchers(
@@ -75,10 +88,10 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
                 frontendUrl,
-                "http://localhost:*",
                 VastaImoveisSite,
+                "http://localhost:*",
                 "https://*.vercel.app"
         ));
 

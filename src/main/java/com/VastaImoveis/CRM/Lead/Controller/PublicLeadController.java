@@ -21,8 +21,6 @@ public class PublicLeadController {
         this.service = service;
     }
 
-
-
     // Public
     @PostMapping()
     public ResponseEntity<ApiResponse<LeadResponseDTO>> publicCreate(
