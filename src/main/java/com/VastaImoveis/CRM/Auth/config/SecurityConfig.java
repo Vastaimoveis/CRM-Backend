@@ -77,6 +77,8 @@ public class SecurityConfig {
                         // 📊 LEADS
                         .requestMatchers("/leads/all").hasRole("GERENTE")
                         .requestMatchers("/leads/**").hasAnyRole("GERENTE", "CORRETOR")
+                        .requestMatchers("/notifications/**").hasAnyRole("GERENTE","CORRETOR")
+                        .requestMatchers("/leadNotes/**").hasAnyRole("GERENTE","CORRETOR")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

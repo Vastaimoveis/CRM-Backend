@@ -7,29 +7,28 @@ import com.VastaImoveis.CRM.Lead.Entity.dto.LeadResponseDTO;
 import com.VastaImoveis.CRM.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.Lead.mapper.LeadMapper;
 import com.VastaImoveis.CRM.LeadNotes.Entity.domain.LeadNote;
-import com.VastaImoveis.CRM.LeadNotes.Entity.dto.LeadNoteRequestDTO;
-import com.VastaImoveis.CRM.LeadNotes.mapper.LeadNoteMapper;
 import com.VastaImoveis.CRM.LeadNotes.repository.LeadNoteRepository;
+import com.VastaImoveis.CRM.Notification.Service.NotificationService;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.Users.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class PublicLeadService {
     private final LeadRepository repository;
     private final LeadNoteRepository leadNoteRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     @Value("${LEAD_DEFAULT_OWNER}")
     private String defaultLeadOwner;
 
-    public PublicLeadService(LeadRepository repository, LeadNoteRepository leadNoteRepository, UserRepository userRepository) {
+    public PublicLeadService(LeadRepository repository, LeadNoteRepository leadNoteRepository, UserRepository userRepository, NotificationService notificationService) {
         this.repository = repository;
         this.leadNoteRepository = leadNoteRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     private void createNote(Lead lead, String note) {
@@ -51,6 +50,8 @@ public class PublicLeadService {
         lead.setUser(user);
         Lead saved = repository.save(lead);
 
+        notificationService.createNewLead(lead,user);
+
         if(!dto.getRendaMedia().isBlank()){
         createNote(saved, "Renda entre: " + dto.getRendaMedia());
         }
@@ -58,6 +59,8 @@ public class PublicLeadService {
         if(!dto.getEmpreendimento().isBlank()){
             createNote(saved, "Empreendimento interessado: " + dto.getEmpreendimento());
         }
+
+
 
         return LeadMapper.toDTO(saved);
     }

@@ -6,7 +6,7 @@ import com.VastaImoveis.CRM.Auth.dto.AuthResponseDTO;
 import com.VastaImoveis.CRM.Auth.dto.AuthResult;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.Users.Entity.dto.UserResponseDTO;
-import com.VastaImoveis.CRM.Users.mapper.userMapper;
+import com.VastaImoveis.CRM.Users.mapper.UserMapper;
 import com.VastaImoveis.CRM.shared.utils.ApiResponse;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class AuthController {
                 .body(
                         new ApiResponse<>(
                                 true,
-                                new AuthResponseDTO(userMapper.toDTO(result.user()), result.accessToken(), result.refreshToken()),
+                                new AuthResponseDTO(UserMapper.toDTO(result.user()), result.accessToken(), result.refreshToken()),
                                 "Login realizado com sucesso"
                         )
                 );
@@ -47,7 +47,7 @@ public class AuthController {
                 .body(
                         new ApiResponse<>(
                                 true,
-                                userMapper.toDTO(user),
+                                UserMapper.toDTO(user),
                                 "Usuário autenticado"
                         )
                 );

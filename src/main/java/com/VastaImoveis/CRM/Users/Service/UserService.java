@@ -8,7 +8,7 @@ import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.Users.Entity.dto.UserRequestDTO;
 import com.VastaImoveis.CRM.Users.Entity.dto.UserResponseDTO;
 import com.VastaImoveis.CRM.Users.Repository.UserRepository;
-import com.VastaImoveis.CRM.Users.mapper.userMapper;
+import com.VastaImoveis.CRM.Users.mapper.UserMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.VastaImoveis.CRM.Users.mapper.userMapper.toDTO;
+import static com.VastaImoveis.CRM.Users.mapper.UserMapper.toDTO;
 
 @Service
 public class UserService {
@@ -60,7 +60,7 @@ public class UserService {
             throw new BusinessException("Você não tem acesso a essa chamada");
         }
 
-        return repository.findByRegiao(regiaoUsers, pageable).map(userMapper::toDTO);
+        return repository.findByRegiao(regiaoUsers, pageable).map(UserMapper::toDTO);
     }
 
     public UserResponseDTO update(UUID id, UserRequestDTO dto) {
@@ -98,13 +98,13 @@ public class UserService {
     }
 
     public UserResponseDTO findById(UUID id){
-        return  userMapper.toDTO(repository.findById(id).orElseThrow(() -> new BusinessException("Erro ao buscar usuário")));
+        return  UserMapper.toDTO(repository.findById(id).orElseThrow(() -> new BusinessException("Erro ao buscar usuário")));
     }
 
     public Page<UserResponseDTO> findAll(Pageable pageable){
 
 
-        return repository.findAll(pageable).map(userMapper::toDTO);
+        return repository.findAll(pageable).map(UserMapper::toDTO);
     }
 
     public void delete(UUID id){
