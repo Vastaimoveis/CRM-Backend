@@ -41,27 +41,28 @@ public class PublicLeadService {
 
     @Transactional
     public LeadResponseDTO publicCreate(LeadPublicRequestDTO dto) {
-        if (repository.existsByTelefone(dto.getTelefone())){
-            throw new BusinessException("Telefone já cadastrado");
-        }
+
         User user = userRepository.findByEmail(defaultLeadOwner)
                 .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
-        Lead lead = LeadMapper.toEntityPublic(dto);
-        lead.setUser(user);
-        Lead saved = repository.save(lead);
 
-        notificationService.createNewLead(lead,user);
+        Lead lead = repository.findByTelefone(dto.getTelefone()).orElse(null);
 
-        if(!dto.getRendaMedia().isBlank()){
-        createNote(saved, "Renda entre: " + dto.getRendaMedia());
+        if (lead == null) {
+            lead = LeadMapper.toEntityPublic(dto);
+            lead.setUser(user);
+            lead = repository.save(lead);
+
+            notificationService.createNewLead(lead, user);
         }
 
-        if(!dto.getEmpreendimento().isBlank()){
-            createNote(saved, "Empreendimento interessado: " + dto.getEmpreendimento());
+        if (dto.getRendaMedia() != null && !dto.getRendaMedia().isBlank()) {
+            createNote(lead, "Renda entre: " + dto.getRendaMedia());
         }
 
+        if (dto.getEmpreendimento() != null && !dto.getEmpreendimento().isBlank()) {
+            createNote(lead, "Empreendimento interessado: " + dto.getEmpreendimento());
+        }
 
-
-        return LeadMapper.toDTO(saved);
+        return LeadMapper.toDTO(lead);
     }
 }

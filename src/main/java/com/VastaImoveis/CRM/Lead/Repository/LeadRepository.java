@@ -132,5 +132,5 @@ ORDER BY l.createdAt DESC
             double taxa = total > 0 ? (double) fechados / total : 0;
         */
 
-
+    Optional<Lead> findByTelefone(String telefone);
 }

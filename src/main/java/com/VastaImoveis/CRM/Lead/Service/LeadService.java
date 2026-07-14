@@ -37,6 +37,9 @@ public class LeadService {
         if (repository.existsByEmail(dto.getEmail()) && !dto.getEmail().isEmpty()) {
             throw new BusinessException("Email já cadastrado");
         }
+        if(repository.existsByTelefone(dto.getTelefone())){
+            throw new BusinessException("Telefone já cadastrado");
+        }
 
         User user = SecurityUtils.getCurrentUser();
         Lead lead = LeadMapper.toEntity(dto);
