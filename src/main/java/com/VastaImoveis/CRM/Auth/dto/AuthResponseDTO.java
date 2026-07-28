@@ -1,6 +1,6 @@
 package com.VastaImoveis.CRM.Auth.dto;
 
-import com.VastaImoveis.CRM.Users.Entity.dto.UserResponseDTO;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.UserResponseDTO;
 
 public class AuthResponseDTO {
     private String accessToken;

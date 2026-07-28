@@ -1,7 +1,6 @@
 package com.VastaImoveis.CRM.Requisitos.Entity.dto;
 
 import com.VastaImoveis.CRM.Requisitos.Entity.Domain.StatusRequisito;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;

@@ -1,11 +1,9 @@
 package com.VastaImoveis.CRM.shared.utils;
 
 
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Objects;
 
 public class SecurityUtils {
 

@@ -1,6 +1,5 @@
 package com.VastaImoveis.CRM.Requisitos.Service;
 
-import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.Exception.ResourceNotFoundException;
 import com.VastaImoveis.CRM.Requisitos.Entity.Domain.Requisito;
 import com.VastaImoveis.CRM.Requisitos.Entity.Domain.StatusRequisito;
@@ -8,8 +7,8 @@ import com.VastaImoveis.CRM.Requisitos.Entity.dto.RequisitoRequestDTO;
 import com.VastaImoveis.CRM.Requisitos.Entity.dto.RequisitoResponseDTO;
 import com.VastaImoveis.CRM.Requisitos.Repository.RequisitosRepository;
 import com.VastaImoveis.CRM.Requisitos.mapper.RequisitoMapper;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
-import com.VastaImoveis.CRM.Users.Repository.UserRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

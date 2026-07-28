@@ -1,9 +1,9 @@
 package com.VastaImoveis.CRM;
 
-import com.VastaImoveis.CRM.Users.Entity.Domain.RegiaoUsers;
-import com.VastaImoveis.CRM.Users.Entity.Domain.RoleUsers;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
-import com.VastaImoveis.CRM.Users.Repository.UserRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RegiaoUsers;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RoleUsers;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -38,7 +38,7 @@ public class CrmApplication {
                 user.setPassword(
                         encoder.encode(adminPassword)
                 );
-                user.setRole(RoleUsers.GERENTE);
+
                 user.setRegiao(RegiaoUsers.CURITIBA);
 
                 repo.save(user);

@@ -1,7 +1,6 @@
 package com.VastaImoveis.CRM.Auth.Jwt;
 
-import com.VastaImoveis.CRM.Exception.InvalidCredentialsException;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

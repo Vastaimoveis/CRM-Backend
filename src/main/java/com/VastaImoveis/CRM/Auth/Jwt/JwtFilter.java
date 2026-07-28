@@ -1,7 +1,7 @@
 package com.VastaImoveis.CRM.Auth.Jwt;
 
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
-import com.VastaImoveis.CRM.Users.Repository.UserRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

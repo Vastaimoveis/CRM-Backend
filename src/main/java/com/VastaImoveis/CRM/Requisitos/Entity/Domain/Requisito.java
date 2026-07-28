@@ -1,6 +1,6 @@
 package com.VastaImoveis.CRM.Requisitos.Entity.Domain;
 
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

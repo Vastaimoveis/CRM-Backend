@@ -1,7 +1,7 @@
 package com.VastaImoveis.CRM.Requisitos.Entity.dto;
 
 import com.VastaImoveis.CRM.Requisitos.Entity.Domain.StatusRequisito;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -5,8 +5,8 @@ import com.VastaImoveis.CRM.Auth.dto.AuthResult;
 import com.VastaImoveis.CRM.Exception.InvalidCredentialsException;
 import com.VastaImoveis.CRM.Exception.InvalidEmailException;
 import com.VastaImoveis.CRM.Exception.InvalidPasswordException;
-import com.VastaImoveis.CRM.Users.Entity.Domain.User;
-import com.VastaImoveis.CRM.Users.Repository.UserRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
