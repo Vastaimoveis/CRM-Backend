@@ -114,4 +114,24 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidEmail(InvalidCredentialsException ex, HttpServletRequest request) {
+        log.error("Email não encontrado: {}", ex.getMessage());
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Email não encontrado",
+                null
+        );
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidPassword(InvalidCredentialsException ex, HttpServletRequest request) {
+        log.error("Senha incorreta: {}", ex.getMessage());
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Senha incorreta",
+                null
+        );
+    }
 }

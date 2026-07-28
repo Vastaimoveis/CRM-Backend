@@ -32,9 +32,7 @@ public class CrmApplication {
         return args -> {
 
             if (!repo.existsByEmail(adminEmail)) {
-
                 User user = new User();
-
                 user.setNome("Administrador");
                 user.setEmail(adminEmail);
                 user.setPassword(

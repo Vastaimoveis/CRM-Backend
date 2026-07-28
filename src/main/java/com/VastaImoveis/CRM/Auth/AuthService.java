@@ -3,6 +3,8 @@ package com.VastaImoveis.CRM.Auth;
 import com.VastaImoveis.CRM.Auth.Jwt.JwtService;
 import com.VastaImoveis.CRM.Auth.dto.AuthResult;
 import com.VastaImoveis.CRM.Exception.InvalidCredentialsException;
+import com.VastaImoveis.CRM.Exception.InvalidEmailException;
+import com.VastaImoveis.CRM.Exception.InvalidPasswordException;
 import com.VastaImoveis.CRM.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.Users.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,10 +28,10 @@ public class AuthService {
     public AuthResult login(String email, String password) {
 
         User user = repository.findByEmail(email)
-                .orElseThrow(InvalidCredentialsException::new);
+                .orElseThrow(InvalidEmailException::new);
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidPasswordException();
         }
         System.out.println(user.getNome());
         System.out.println(user.getRole());
