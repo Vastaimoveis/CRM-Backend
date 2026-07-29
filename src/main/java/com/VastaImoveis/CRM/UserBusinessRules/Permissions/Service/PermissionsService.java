@@ -5,16 +5,17 @@ import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.Permissi
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Dto.PermissionRequestDTO;
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Dto.PermissionResponseDTO;
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Mapper.PermissionMapper;
-import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Repository.PermissonsRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Repository.PermissionsRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class PermissionsService {
-    private PermissonsRepository repository;
+    private PermissionsRepository repository;
 
-    public PermissionsService(PermissonsRepository repository) {
+    public PermissionsService(PermissionsRepository repository) {
         this.repository = repository;
     }
 
@@ -28,6 +29,12 @@ public class PermissionsService {
                 .orElseThrow(() -> new BusinessException("Permissão não encontrada"));
 
         return  permission;
+    }
+
+    public List <PermissionResponseDTO> findAll(){
+        List<Permission> permission = repository.findAll();
+
+        return permission.stream().map(PermissionMapper::toDTO).toList();
     }
 
     public PermissionResponseDTO getById(UUID id) {

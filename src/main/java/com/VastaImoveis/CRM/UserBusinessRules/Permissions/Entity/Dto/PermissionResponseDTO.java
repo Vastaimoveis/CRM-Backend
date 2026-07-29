@@ -9,6 +9,7 @@ public class PermissionResponseDTO {
     private PermissionName name;
     private String description;
 
+
     public PermissionResponseDTO(UUID id, PermissionName name, String description) {
         this.id = id;
         this.name = name;
