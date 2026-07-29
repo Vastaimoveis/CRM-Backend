@@ -23,18 +23,6 @@ public class PermissionsController {
     }
 
     @PreAuthorize("hasAnyRole('GERENTE')")
-    @PostMapping
-    public ResponseEntity<ApiResponse<PermissionResponseDTO>> create(PermissionRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ApiResponse<>(
-                        true,
-                        service.create(dto),
-                        "Permissão criada com sucesso"
-                )
-        );
-    }
-
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PermissionResponseDTO>> listById(UUID id) {
         return ResponseEntity.status(HttpStatus.FOUND).body(

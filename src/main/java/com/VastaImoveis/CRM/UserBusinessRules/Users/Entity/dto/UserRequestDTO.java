@@ -5,6 +5,8 @@ import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RoleUsers;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 public class UserRequestDTO {
     @NotBlank
     private String nome;
@@ -22,7 +24,7 @@ public class UserRequestDTO {
         return telefone;
     }
 
-    private RoleUsers role;
+    private UUID role;
 
     private RegiaoUsers regiao;
 
@@ -38,7 +40,7 @@ public class UserRequestDTO {
         return password;
     }
 
-    public RoleUsers getRole() {
+    public UUID getRole() {
         return role;
     }
 

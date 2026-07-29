@@ -1,7 +1,6 @@
 package com.VastaImoveis.CRM.LeadBusinessRules.Lead.Controller;
 
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead;
-import com.VastaImoveis.CRM.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Service.LeadService;
 import com.VastaImoveis.CRM.shared.utils.ApiResponse;

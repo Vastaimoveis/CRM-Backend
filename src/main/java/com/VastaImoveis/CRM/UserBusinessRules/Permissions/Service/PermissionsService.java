@@ -25,10 +25,9 @@ public class PermissionsService {
     }
 
     private Permission findEntity(UUID id){
-        Permission permission = repository.findById(id)
-                .orElseThrow(() -> new BusinessException("Permissão não encontrada"));
 
-        return  permission;
+        return repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Permissão não encontrada"));
     }
 
     public List <PermissionResponseDTO> findAll(){

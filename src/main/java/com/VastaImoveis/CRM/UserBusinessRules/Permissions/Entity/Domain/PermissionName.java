@@ -5,6 +5,7 @@ public enum PermissionName {
     LEAD_CREATE,
     LEAD_EDIT,
     LEAD_DELETE,
+    LEAD_EXPORT,
 
     USER_VIEW,
     USER_CREATE,

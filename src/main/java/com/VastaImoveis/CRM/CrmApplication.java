@@ -14,39 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 public class CrmApplication {
 
-    @Value("${ADMIN_EMAIL}")
-    private String adminEmail;
-
-    @Value("${ADMIN_PASSWORD}")
-    private String adminPassword;
-
     public static void main(String[] args) {
         SpringApplication.run(CrmApplication.class, args);
-    }
-    @Bean
-    CommandLineRunner init(
-            UserRepository repo,
-            PasswordEncoder encoder
-    ) {
-
-        return args -> {
-
-            if (!repo.existsByEmail(adminEmail)) {
-                User user = new User();
-                user.setNome("Administrador");
-                user.setEmail(adminEmail);
-                user.setPassword(
-                        encoder.encode(adminPassword)
-                );
-
-                user.setRegiao(RegiaoUsers.CURITIBA);
-
-                repo.save(user);
-
-                System.out.println(
-                        "Usuário administrador criado."
-                );
-            }
-        };
     }
 }

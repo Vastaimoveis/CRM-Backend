@@ -46,7 +46,7 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
     Page<Lead> findByStatusNotAndUser_Id(StatusLead status, UUID userId, Pageable pageable);
     @Query("""
 
-                 SELECT new com.VastaImoveis.CRM.Lead.Entity.dto.StatusCount(l.status, COUNT(l))
+                 SELECT new com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.StatusCount(l.status, COUNT(l))
                 FROM Lead l
                 WHERE (:user IS NULL OR l.user = :user)
                 GROUP BY l.status
@@ -54,7 +54,7 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
     List<StatusCount> countByStatus(User user);
 
     @Query("""
-    SELECT new com.VastaImoveis.CRM.Lead.Entity.dto.StatusCount(
+    SELECT new com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.StatusCount(
         l.status,
         COUNT(l)
     )
@@ -89,7 +89,7 @@ WHERE
 )
 AND
 (
-    (:status IS NULL AND l.status <> com.VastaImoveis.CRM.Lead.Entity.Domain.StatusLead.ENCERRADO)
+    (:status IS NULL AND l.status <> com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead.ENCERRADO)
     OR l.status = :status
 )
 AND

@@ -3,7 +3,6 @@ package com.VastaImoveis.CRM.LeadBusinessRules.Lead.Service;
 import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead;
-import com.VastaImoveis.CRM.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadDashboardDTO;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadRequestDTO;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadResponseDTO;
@@ -54,7 +53,7 @@ public class LeadService {
 
         User user = SecurityUtils.getCurrentUser();
 
-        if (user.getRole().name().equals("GERENTE")) {
+        if (user.getRole().getName().equals("GERENTE")) {
             Page<Lead> page = repository.findAll(pageable);
             List<UUID> leadIds = page.getContent()
                     .stream().map(Lead::getId).toList();
@@ -79,7 +78,7 @@ public class LeadService {
     public Page<LeadResponseDTO> findByStatus(Pageable pageable, StatusLead status) {
         User user = SecurityUtils.getCurrentUser();
 
-        if(!user.getRole().name().equals("GERENTE") && status.equals(StatusLead.ENCERRADO)){
+        if(!user.getRole().getName().equals("GERENTE") && status.equals(StatusLead.ENCERRADO)){
             throw new BusinessException("Você não tem acesso a essa chamada");
         }
 
@@ -151,7 +150,7 @@ public class LeadService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("Erro ao buscar usuário no filter"));
 
-        boolean isGerente = user.getRole().name().equals("GERENTE");
+        boolean isGerente = user.getRole().getName().equals("GERENTE");
 
         Page<Lead> page = repository
                 .filter(search, status, isGerente ? null : userId, start, end, pageable);
@@ -186,7 +185,7 @@ public class LeadService {
 
         List<Lead> leads;
 
-        if(user.getRole().name().equals("GERENTE")){
+        if(user.getRole().getName().equals("GERENTE")){
             leads = repository.findByStatusIn(statusPermitidos);
         } else {
             leads = repository.findByStatusInAndUserId(
@@ -210,7 +209,7 @@ public class LeadService {
 
     public Page<LeadResponseDTO> findAllByUser(UUID userId, Pageable pageable){
         User user = SecurityUtils.getCurrentUser();
-        if(!user.getRole().name().equals("Gerente")){
+        if(!user.getRole().getName().equals("Gerente")){
             throw new BusinessException("Você não tem permissão para essa chamada");
         }
         return repository.findByUserId(userId, pageable).map(LeadMapper::toDTO);
@@ -220,7 +219,7 @@ public class LeadService {
         User user = SecurityUtils.getCurrentUser();
         Lead lead = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Lead não encontrado"));
-        if (user.getRole().name().equals("CORRETOR") &&
+        if (user.getRole().getName().equals("CORRETOR") &&
                 !lead.getUser().getId().equals(user.getId())) {
             throw new BusinessException("Você não pode acessar este lead");
         }
@@ -235,7 +234,7 @@ public class LeadService {
         Lead lead = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Lead não encontrado"));
 
-        if (user.getRole().name().equals("CORRETOR") &&
+        if (user.getRole().getName().equals("CORRETOR") &&
                 !lead.getUser().getId().equals(user.getId())) {
             throw new BusinessException("Você não pode editar este Lead");
         }
@@ -266,7 +265,7 @@ public class LeadService {
 
     public LeadResponseDTO patchLeadCorretor(UUID leadId, UUID userId){
         User userLogged = SecurityUtils.getCurrentUser();
-        boolean isGerente = userLogged.getRole().name().equals("GERENTE");
+        boolean isGerente = userLogged.getRole().getName().equals("GERENTE");
         if(!isGerente){
             throw new BusinessException("Você não tem permissão para alterar essa informação");
         }
@@ -282,7 +281,7 @@ public class LeadService {
     public void delete(UUID id) {
         User user = SecurityUtils.getCurrentUser();
 
-        if (!user.getRole().name().equals("GERENTE")) {
+        if (!user.getRole().getName().equals("GERENTE")) {
             throw new BusinessException("Apenas gerentes podem deletar leads");
         }
 
@@ -299,7 +298,7 @@ public class LeadService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("User não encontrado no dashboard"));;
 
-        boolean isGerente = user.getRole().name().equals("GERENTE");
+        boolean isGerente = user.getRole().getName().equals("GERENTE");
         // 👇 null = todos os leads
         List<StatusCount> result = repository.countByStatus(isGerente ? null : user);
 
@@ -318,7 +317,7 @@ public class LeadService {
 
         User user = SecurityUtils.getCurrentUser();
 
-        boolean isGerente = user.getRole().name().equals("GERENTE");
+        boolean isGerente = user.getRole().getName().equals("GERENTE");
 
         // 👇 null = todos os leads
         List<StatusCount> result = repository.countByStatusByUser(userId);

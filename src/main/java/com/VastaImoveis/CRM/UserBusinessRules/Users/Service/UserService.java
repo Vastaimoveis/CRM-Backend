@@ -2,6 +2,9 @@ package com.VastaImoveis.CRM.UserBusinessRules.Users.Service;
 
 import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.PermissionName;
+import com.VastaImoveis.CRM.UserBusinessRules.Roles.Entity.Domain.Role;
+import com.VastaImoveis.CRM.UserBusinessRules.Roles.Repository.RoleRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Roles.Service.RoleService;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RegiaoUsers;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RoleUsers;
@@ -24,11 +27,14 @@ public class UserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     public UserService(UserRepository repository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       RoleRepository roleRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
 
@@ -91,7 +97,9 @@ public class UserService {
 
         // ⚠️ Role: opcional (depende da sua regra de negócio)
         if (dto.getRole() != null) {
-            user.setRole(dto.getRole());
+            Role role = roleRepository.findById(dto.getRole())
+                    .orElseThrow(() -> new BusinessException("Cargo não encontrado ao atualizar um usuário"));
+            user.setRole(role);
         }
 
         return toDTO(repository.save(user));

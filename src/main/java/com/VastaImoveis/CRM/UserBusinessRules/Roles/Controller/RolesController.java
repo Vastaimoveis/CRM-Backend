@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/role")
@@ -35,7 +36,7 @@ public class RolesController {
 
     @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<RoleResponseDto>>> findAll(){
+    public ResponseEntity<ApiResponse<List<RoleResponseDto>>> findAll() {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
                         true,
@@ -47,5 +48,14 @@ public class RolesController {
 
     @PreAuthorize("hasAnyRole('GERENTE')")
     @DeleteMapping
-    public ResponseEntity<ApiResponse<>>
+    public ResponseEntity<ApiResponse> Delete(UUID id) {
+        service.delete(id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                new ApiResponse<>(
+                        true,
+                        null,
+                        "Cargo deletado com scuesso"
+                )
+        );
+    }
 }

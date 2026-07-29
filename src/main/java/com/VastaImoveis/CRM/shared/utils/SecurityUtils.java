@@ -21,6 +21,6 @@ public class SecurityUtils {
     }
 
     public static boolean isGerente(){
-        return  getCurrentUser().getRole().name().equals("GERENTE");
+        return  getCurrentUser().getRole().getName().equals("GERENTE");
     }
 }

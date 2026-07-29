@@ -27,8 +27,12 @@ public class User {
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "newRole")
+    private Role newRole;
+
+    @Enumerated(EnumType.STRING)
     @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    private RoleUsers role;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "regiao", nullable = false)
@@ -82,11 +86,11 @@ public class User {
     }
 
     public Role getRole() {
-        return role;
+        return newRole;
     }
 
     public void setRole(Role role) {
-        this.role = role;
+        this.newRole = role;
     }
 
     public RegiaoUsers getRegiao() {
@@ -106,6 +110,14 @@ public class User {
     }
 
     public boolean hasPermission(PermissionName permission) {
-        return role.getPermissions().stream().anyMatch(p -> p.getName() == permission);
+        return newRole.getPermissions().stream().anyMatch(p -> p.getName() == permission);
+    }
+
+    public RoleUsers getLegacyRole() {
+        return role;
+    }
+
+    public void setLegacyRole(RoleUsers legacyRole) {
+        this.role = legacyRole;
     }
 }

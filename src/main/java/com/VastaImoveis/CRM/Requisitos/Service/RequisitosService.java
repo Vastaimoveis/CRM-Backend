@@ -45,7 +45,7 @@ public class RequisitosService {
     public Page<RequisitoResponseDTO> findAll(Pageable pageable){
         User user = SecurityUtils.getCurrentUser();
 
-        if(user.getRole().name().equals("GERENTE")){
+        if(user.getRole().getName().equals("GERENTE")){
             return repository.findByGerente(user, pageable)
                     .map(RequisitoMapper::toDTO);
         }
@@ -63,7 +63,7 @@ public class RequisitosService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        if(user.getRole().name().equals("GERENTE")){
+        if(user.getRole().getName().equals("GERENTE")){
             return repository.findByGerente(user, pageable)
                     .map(RequisitoMapper::toDTO);
         }

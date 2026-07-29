@@ -9,11 +9,13 @@ import com.VastaImoveis.CRM.UserBusinessRules.Roles.Entity.Dto.RoleRequestDto;
 import com.VastaImoveis.CRM.UserBusinessRules.Roles.Entity.Dto.RoleResponseDto;
 import com.VastaImoveis.CRM.UserBusinessRules.Roles.Mapper.RoleMapper;
 import com.VastaImoveis.CRM.UserBusinessRules.Roles.Repository.RoleRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Service
 public class RoleService {
     private RoleRepository repository;
     private PermissionsRepository permissionsRepository;
