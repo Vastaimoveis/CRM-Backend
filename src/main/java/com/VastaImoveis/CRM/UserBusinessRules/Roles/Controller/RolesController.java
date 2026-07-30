@@ -41,7 +41,7 @@ public class RolesController {
                 new ApiResponse<>(
                         true,
                         service.findAll(),
-                        "Cargo criado com sucesso"
+                        "Cargos buscados com sucesso"
                 )
         );
     }

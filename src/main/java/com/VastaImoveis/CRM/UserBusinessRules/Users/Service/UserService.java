@@ -4,10 +4,9 @@ import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.PermissionName;
 import com.VastaImoveis.CRM.UserBusinessRules.Roles.Entity.Domain.Role;
 import com.VastaImoveis.CRM.UserBusinessRules.Roles.Repository.RoleRepository;
-import com.VastaImoveis.CRM.UserBusinessRules.Roles.Service.RoleService;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.updateUserRoleDto;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RegiaoUsers;
-import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RoleUsers;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.UserRequestDTO;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.UserResponseDTO;
@@ -40,6 +39,7 @@ public class UserService {
 
     public UserResponseDTO create(UserRequestDTO dto) {
         User userAtual = SecurityUtils.getCurrentUser();
+        assert userAtual != null;
         if (userAtual.hasPermission(PermissionName.USER_CREATE)) {
             throw new BusinessException("Você não tem permissão para criar um usuário");
         }
@@ -62,6 +62,7 @@ public class UserService {
 
     public Page<UserResponseDTO> listUserByRegiao(RegiaoUsers regiaoUsers, Pageable pageable) {
         User user = SecurityUtils.getCurrentUser();
+        assert user != null;
         if (user.hasPermission(PermissionName.USER_VIEW)) {
             throw new BusinessException("Você não tem acesso a essa chamada");
         }
@@ -71,6 +72,7 @@ public class UserService {
 
     public UserResponseDTO update(UUID id, UserRequestDTO dto) {
         User userAtual = SecurityUtils.getCurrentUser();
+        assert userAtual != null;
         if (userAtual.hasPermission(PermissionName.USER_EDIT)) {
             throw new BusinessException("Você não tem acesso a essa chamada");
         }
@@ -103,6 +105,20 @@ public class UserService {
         }
 
         return toDTO(repository.save(user));
+    }
+
+    public UserResponseDTO patchRole(UUID id, updateUserRoleDto roleId) {
+        Role role = roleRepository.findById(roleId.roleId())
+                .orElseThrow(() -> new BusinessException("Role não encontrada ao atualizar a role do user"));
+
+        User user = repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Erro ao buscar usuário"));
+
+        if (user.getRole().getName().equalsIgnoreCase(role.getName())) {
+            throw new BusinessException("A role do user já é a mesma indicada");
+        }
+        user.setRole(role);
+        return UserMapper.toDTO(repository.save(user));
     }
 
     public UserResponseDTO findById(UUID id) {

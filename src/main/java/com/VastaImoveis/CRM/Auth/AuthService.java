@@ -33,10 +33,9 @@ public class AuthService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidPasswordException();
         }
-        System.out.println(user.getNome());
-        System.out.println(user.getRole());
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.gerenateRefreshToken(user);
+
         return new AuthResult(token, refreshToken, user);
     }
     public String refreshToken(User user){

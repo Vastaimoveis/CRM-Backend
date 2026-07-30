@@ -29,6 +29,8 @@ public class AuthController {
         String email = dto.getEmail().toLowerCase().trim();
         AuthResult result = service.login(email, dto.getPassword());
 
+        System.out.println(result.user().getRole());
+
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
                         new ApiResponse<>(
@@ -43,6 +45,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponseDTO>> me() {
         User user = SecurityUtils.getCurrentUser();
 
+        assert user != null;
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
                         new ApiResponse<>(

@@ -1,5 +1,6 @@
 package com.VastaImoveis.CRM.UserBusinessRules.Users.Controller;
 
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.updateUserRoleDto;
 import com.VastaImoveis.CRM.shared.utils.ApiResponse;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.RegiaoUsers;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.dto.UserRequestDTO;
@@ -45,22 +46,32 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyRole('GERENTE')")
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<ApiResponse<UserResponseDTO>> patchRole(
+            @PathVariable UUID id,
+            @RequestBody @Valid updateUserRoleDto roleId) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                new ApiResponse<>(true, service.patchRole(id, roleId), "Role do user atualizada com sucesso")
+            );
+    }
+
+    @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponseDTO>> findById(@PathVariable UUID id){
+    public ResponseEntity<ApiResponse<UserResponseDTO>> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, service.findById(id), "User encontrado com sucesso"));
     }
 
     @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/regiao/{Regiao}")
-    public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findByRegiao(@PathVariable("Regiao") RegiaoUsers regiaoUsers, Pageable pageable){
+    public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findByRegiao(@PathVariable("Regiao") RegiaoUsers regiaoUsers, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
-                        new ApiResponse<>(true, service.listUserByRegiao(regiaoUsers, pageable),"Users listados por região com sucesso"));
+                        new ApiResponse<>(true, service.listUserByRegiao(regiaoUsers, pageable), "Users listados por região com sucesso"));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findAll(Pageable pageable){
+    public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
                         new ApiResponse<>(true, service.findAll(pageable), "Users listados com sucesso"));
@@ -68,11 +79,13 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('GERENTE')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") UUID userId){
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") UUID userId) {
         service.delete(userId);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, null, "User deletado com sucesso")
         );
     }
+
+
 }
