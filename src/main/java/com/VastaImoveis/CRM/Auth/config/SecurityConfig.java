@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -57,31 +59,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                 })
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/public/leads")
-                        .permitAll()
-
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        .requestMatchers("/auth/me").authenticated()
-                        // 🔐 ADMIN
-                        .requestMatchers("/admin/**").hasRole("GERENTE")
-                        //    USERS
-                        .requestMatchers("/users/**").hasRole("GERENTE")
-                        // 📊 LEADS
-                        .requestMatchers("/leads/all").hasRole("GERENTE")
-                        .requestMatchers("/leads/**").hasAnyRole("GERENTE", "CORRETOR")
-                        .requestMatchers("/notifications/**").hasAnyRole("GERENTE","CORRETOR")
-                        .requestMatchers("/leadNotes/**").hasAnyRole("GERENTE","CORRETOR")
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("/auth/login", "/auth/refresh").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/public/leads").permitAll()
+                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                .anyRequest().authenticated()
+                );
         return http.build();
     }
 
@@ -105,7 +89,7 @@ public class SecurityConfig {
                 "DELETE",
                 "OPTIONS"
         ));
- 
+
         config.setAllowedHeaders(List.of("*"));
 
         config.setAllowCredentials(true);

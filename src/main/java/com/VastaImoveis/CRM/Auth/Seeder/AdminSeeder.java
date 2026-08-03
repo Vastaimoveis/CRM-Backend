@@ -35,7 +35,6 @@ public class AdminSeeder {
             user.setRegiao(RegiaoUsers.CURITIBA);
             user.setRole(adminRole);
             repo.save(user);
-            System.out.println("Usuário administrador criado com sucesso." + user.getRole());
         };
     }
 }

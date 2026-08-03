@@ -11,6 +11,7 @@ import com.VastaImoveis.CRM.shared.utils.ApiResponse;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +30,6 @@ public class AuthController {
         String email = dto.getEmail().toLowerCase().trim();
         AuthResult result = service.login(email, dto.getPassword());
 
-        System.out.println(result.user().getRole());
 
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
@@ -54,6 +54,11 @@ public class AuthController {
                                 "Usuário autenticado"
                         )
                 );
+    }
+
+    @GetMapping("/me/authorities")
+    public Object authorities(Authentication authentication) {
+        return authentication.getAuthorities();
     }
 
     @PostMapping("/refresh")

@@ -22,7 +22,7 @@ public class PermissionsController {
         this.service = service;
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PermissionResponseDTO>> listById(UUID id) {
         return ResponseEntity.status(HttpStatus.FOUND).body(
@@ -34,7 +34,7 @@ public class PermissionsController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<PermissionResponseDTO>>> listAll() {
         return ResponseEntity.status(HttpStatus.FOUND).body(
@@ -46,7 +46,8 @@ public class PermissionsController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping
     public ResponseEntity<ApiResponse> deletePermission(UUID id) {
         service.delete(id);

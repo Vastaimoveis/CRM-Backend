@@ -28,15 +28,15 @@ public class UserController {
     }
 
     @Operation(summary = "Criar usuário")
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @PostMapping
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<ApiResponse<UserResponseDTO>> create(@RequestBody @Valid UserRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, service.create(dto), "User criado com sucesso"));
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_EDIT')")
     public ResponseEntity<ApiResponse<UserResponseDTO>> update(
             @PathVariable UUID id,
             @RequestBody @Valid UserRequestDTO dto
@@ -45,8 +45,8 @@ public class UserController {
                 new ApiResponse<>(true, service.update(id, dto), "User alterado com sucesso"));
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @PatchMapping("/{id}/role")
+    @PreAuthorize("hasAuthority('USER_CHANGE_ROLE')")
     public ResponseEntity<ApiResponse<UserResponseDTO>> patchRole(
             @PathVariable UUID id,
             @RequestBody @Valid updateUserRoleDto roleId) {
@@ -55,15 +55,15 @@ public class UserController {
             );
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public ResponseEntity<ApiResponse<UserResponseDTO>> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, service.findById(id), "User encontrado com sucesso"));
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @GetMapping("/regiao/{Regiao}")
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findByRegiao(@PathVariable("Regiao") RegiaoUsers regiaoUsers, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
@@ -71,14 +71,15 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("USER_VIEW")
     public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(
                         new ApiResponse<>(true, service.findAll(pageable), "Users listados com sucesso"));
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE')")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") UUID userId) {
         service.delete(userId);
 

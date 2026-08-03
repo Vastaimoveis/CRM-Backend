@@ -24,7 +24,7 @@ public class NotificationController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
+    @PreAuthorize("hasAuthority('REMINDER_VIEW')")
     public ResponseEntity<ApiResponse<List<NotificationResponseDTO>>> findByUser(
             @PathVariable UUID userId
     ) {
@@ -37,7 +37,7 @@ public class NotificationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
+    @PreAuthorize("hasAuthority('REMINDER_CREATE')")
     public ResponseEntity<ApiResponse<NotificationResponseDTO>> createNotification(
             @RequestBody NotificationRequestDTO dto
     ) {
@@ -50,7 +50,7 @@ public class NotificationController {
     }
 
     @PatchMapping("/{notificationId}")
-    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
+    @PreAuthorize("hasAuthority('REMINDER_PATCH')")
     public ResponseEntity<ApiResponse<NotificationResponseDTO>> patchRead(
             @RequestBody NotificationReadDTO dto,
             @PathVariable UUID notificationId
@@ -65,7 +65,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{notificationId}")
-    @PreAuthorize("hasAnyRole('GERENTE','CORRETOR')")
+    @PreAuthorize("hasAuthority('REMINDER_DELETE')")
     public ResponseEntity<ApiResponse<Void>> deleteNotification(
             @PathVariable UUID notificationId
     ) {

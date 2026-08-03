@@ -4,6 +4,7 @@ import com.VastaImoveis.CRM.Exception.BusinessException;
 import com.VastaImoveis.CRM.Exception.ResourceNotFoundException;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Repository.LeadRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.PermissionName;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.Entity.domain.LeadNote;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.Entity.dto.LeadNoteRequestDTO;
@@ -28,11 +29,9 @@ public class LeadNoteService {
     }
 
     //Criar anotação
-    public LeadNoteResponseDTO create(LeadNoteRequestDTO dto){
-
-
+    public LeadNoteResponseDTO create(LeadNoteRequestDTO dto) {
         Lead lead = leadRepository.findById(dto.getLead()).orElseThrow(() -> new ResourceNotFoundException("Lead não encontrado"));
-        if(!SecurityUtils.isGerente() && !lead.getUser().getId().equals(SecurityUtils.getCurrentUser().getId())){
+        if (!lead.getUser().getId().equals(SecurityUtils.getCurrentUser().getId())) {
             throw new BusinessException("Você não tem permissão para adicionar nota neste lead");
         }
         LeadNote leadNote = LeadNoteMapper.toEntity(dto);
@@ -43,16 +42,16 @@ public class LeadNoteService {
     }
 
     //Listar por lead
-    public Page<LeadNoteResponseDTO> findByLead(Lead lead, Pageable pageable){
+    public Page<LeadNoteResponseDTO> findByLead(Lead lead, Pageable pageable) {
         return repository.findByLead(lead, pageable).map(LeadNoteMapper::toDTO);
     }
 
-    public Page<LeadNoteResponseDTO> findByLeadId(UUID id, Pageable pageable){
+    public Page<LeadNoteResponseDTO> findByLeadId(UUID id, Pageable pageable) {
         return repository.findByLeadIdOrderByCreatedAtDesc(id, pageable).map(LeadNoteMapper::toDTO);
     }
 
     //Buscar por ID
-    public LeadNoteResponseDTO findById(UUID id){
+    public LeadNoteResponseDTO findById(UUID id) {
         LeadNote leadNote = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Anotação não encontrada"));
 
@@ -60,8 +59,8 @@ public class LeadNoteService {
     }
 
     //Deletar
-    public void delete(UUID id){
-        
+    public void delete(UUID id) {
+
         LeadNote leadNote = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Anotação não encontrada"));
 

@@ -24,7 +24,7 @@ public class LeadNoteController {
         this.service = service;
     }
 
-    @PreAuthorize("hasAnyRole('GERENTE', 'CORRETOR')")
+    @PreAuthorize("hasAuthority('NOTE_CREATE')")
     @PostMapping
     public ResponseEntity<ApiResponse<LeadNoteResponseDTO>> create(
             @RequestBody @Valid LeadNoteRequestDTO dto) {
@@ -35,6 +35,7 @@ public class LeadNoteController {
         );
     }
 
+    @PreAuthorize("hasAuthority('NOTE_VIEW')")
     @GetMapping("/{leadId}")
     public ResponseEntity<ApiResponse<Page<LeadNoteResponseDTO>>> findByLeadId(
             @PathVariable UUID leadId,
@@ -47,6 +48,7 @@ public class LeadNoteController {
                 );
     }
 
+    @PreAuthorize("hasAuthority('NOTE_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteById(
             @PathVariable UUID id

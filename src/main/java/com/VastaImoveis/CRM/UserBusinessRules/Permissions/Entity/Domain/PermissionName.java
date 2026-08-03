@@ -2,10 +2,13 @@ package com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain;
 
 public enum PermissionName {
     LEAD_VIEW,
+    LEAD_NOTIFICATION,
     LEAD_CREATE,
     LEAD_EDIT,
+    LEAD_PATCH_STATUS,
     LEAD_DELETE,
     LEAD_EXPORT,
+    LEAD_ASSIGN,
 
     USER_VIEW,
     USER_CREATE,
@@ -14,6 +17,13 @@ public enum PermissionName {
     USER_CHANGE_ROLE,
 
     REPORT_VIEW,
+    REMINDER_VIEW,
     REMINDER_CREATE,
-    REMINDER_EDIT
+    REMINDER_PATCH,
+    REMINDER_EDIT,
+    REMINDER_DELETE,
+
+    NOTE_VIEW,
+    NOTE_CREATE,
+    NOTE_DELETE,
 }

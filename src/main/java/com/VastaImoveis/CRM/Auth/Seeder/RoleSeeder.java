@@ -19,25 +19,44 @@ public class RoleSeeder {
     @Bean
     CommandLineRunner seedRoles(RoleRepository roleRepository, PermissionsRepository permissionRepository) {
         return args -> {
-            createRoleIfNotExists(
+            syncRole(
                     roleRepository,
                     permissionRepository,
                     "ADMIN",
                     "Administrador do sistema",
                     Set.of(PermissionName.values()));
-            createRoleIfNotExists(
+            syncRole(
                     roleRepository,
                     permissionRepository,
                     "GERENTE",
                     "Gerente comercial",
                     Set.of(
                             PermissionName.LEAD_VIEW,
+                            PermissionName.LEAD_NOTIFICATION,
                             PermissionName.LEAD_CREATE,
+                            PermissionName.LEAD_PATCH_STATUS,
                             PermissionName.LEAD_EDIT,
                             PermissionName.LEAD_EXPORT,
-                            PermissionName.REPORT_VIEW, PermissionName.USER_VIEW
+                            PermissionName.LEAD_DELETE,
+
+                            PermissionName.REPORT_VIEW,
+
+                            PermissionName.USER_VIEW,
+                            PermissionName.USER_CREATE,
+                            PermissionName.USER_CHANGE_ROLE,
+
+                            PermissionName.NOTE_CREATE,
+                            PermissionName.NOTE_VIEW,
+                            PermissionName.NOTE_DELETE,
+
+                            PermissionName.REMINDER_CREATE,
+                            PermissionName.REMINDER_EDIT,
+
+                            PermissionName.REMINDER_VIEW,
+                            PermissionName.REMINDER_PATCH,
+                            PermissionName.REMINDER_DELETE
                     ));
-            createRoleIfNotExists(
+            syncRole(
                     roleRepository,
                     permissionRepository,
                     "CORRETOR",
@@ -46,8 +65,16 @@ public class RoleSeeder {
                             PermissionName.LEAD_VIEW,
                             PermissionName.LEAD_CREATE,
                             PermissionName.LEAD_EDIT,
+                            PermissionName.LEAD_PATCH_STATUS,
+
+                            PermissionName.REMINDER_VIEW,
                             PermissionName.REMINDER_CREATE,
-                            PermissionName.REMINDER_EDIT
+                            PermissionName.REMINDER_EDIT,
+                            PermissionName.REMINDER_PATCH,
+                            PermissionName.REMINDER_DELETE,
+
+                            PermissionName.NOTE_VIEW,
+                            PermissionName.NOTE_CREATE
                     ));
         };
     }
@@ -68,6 +95,22 @@ public class RoleSeeder {
                                 .orElseThrow(() ->
                                         new RuntimeException("Permissão não encontrada: " + permissionName))).collect(Collectors.toSet());
         Role role = new Role();
+        role.setName(name);
+        role.setDescription(description);
+        role.setPermissions(permissions);
+        roleRepository.save(role);
+    }
+
+    private void syncRole(RoleRepository roleRepository, PermissionsRepository permissionRepository, String name, String description, Set<PermissionName> permissionNames) {
+        Set<Permission> permissions = permissionNames
+                .stream().map(
+                        permissionName ->
+                                permissionRepository.findByName(permissionName)
+                                        .orElseThrow(() ->
+                                                new RuntimeException("Permissão não encontrada: " + permissionName)))
+                .collect(Collectors
+                        .toSet());
+        Role role = roleRepository.findByName(name).orElseGet(Role::new);
         role.setName(name);
         role.setDescription(description);
         role.setPermissions(permissions);

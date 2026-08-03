@@ -27,4 +27,8 @@ public class RoleResponseDto {
     public String getDescription() {
         return description;
     }
+
+    public Set<String> getPermissions() {
+        return permissions;
+    }
 }

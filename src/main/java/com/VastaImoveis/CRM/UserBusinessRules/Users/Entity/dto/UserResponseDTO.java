@@ -11,7 +11,7 @@ public class UserResponseDTO {
     private String nome;
     private String email;
     private String telefone;
-    private UUID role;
+    private Role role;
     private RegiaoUsers regiao;
 
     public String getTelefone() {
@@ -22,7 +22,7 @@ public class UserResponseDTO {
         this.telefone = telefone;
     }
 
-    public UserResponseDTO(UUID id, String nome, String email, String telefone, UUID role, RegiaoUsers regiao) {
+    public UserResponseDTO(UUID id, String nome, String email, String telefone, Role role, RegiaoUsers regiao) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -55,11 +55,11 @@ public class UserResponseDTO {
         this.email = email;
     }
 
-    public UUID getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(UUID role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
