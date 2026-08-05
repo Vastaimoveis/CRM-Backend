@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public class LeadNoteRequestDTO {
+public class  LeadNoteRequestDTO {
 
     @NotBlank
     private String note;

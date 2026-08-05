@@ -72,7 +72,7 @@ public class NotificationController {
 
         service.delete(notificationId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 new ApiResponse<>(true, null, "Notificação deletada com sucesso")
         );
     }

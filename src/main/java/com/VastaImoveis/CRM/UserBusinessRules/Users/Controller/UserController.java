@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("USER_VIEW")
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public ResponseEntity<ApiResponse<Page<UserResponseDTO>>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(

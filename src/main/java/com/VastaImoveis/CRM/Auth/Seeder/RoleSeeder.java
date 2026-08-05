@@ -32,18 +32,23 @@ public class RoleSeeder {
                     "Gerente comercial",
                     Set.of(
                             PermissionName.LEAD_VIEW,
+                            PermissionName.LEAD_ASSIGN,
                             PermissionName.LEAD_NOTIFICATION,
                             PermissionName.LEAD_CREATE,
                             PermissionName.LEAD_PATCH_STATUS,
                             PermissionName.LEAD_EDIT,
+                            PermissionName.LEAD_EDIT_PHONE,
                             PermissionName.LEAD_EXPORT,
                             PermissionName.LEAD_DELETE,
 
                             PermissionName.REPORT_VIEW,
 
                             PermissionName.USER_VIEW,
+                            PermissionName.USER_VISUAL,
                             PermissionName.USER_CREATE,
                             PermissionName.USER_CHANGE_ROLE,
+                            PermissionName.USER_EDIT,
+                            PermissionName.USER_DELETE,
 
                             PermissionName.NOTE_CREATE,
                             PermissionName.NOTE_VIEW,
@@ -51,7 +56,6 @@ public class RoleSeeder {
 
                             PermissionName.REMINDER_CREATE,
                             PermissionName.REMINDER_EDIT,
-
                             PermissionName.REMINDER_VIEW,
                             PermissionName.REMINDER_PATCH,
                             PermissionName.REMINDER_DELETE

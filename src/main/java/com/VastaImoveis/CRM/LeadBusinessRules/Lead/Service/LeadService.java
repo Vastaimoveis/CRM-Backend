@@ -10,6 +10,7 @@ import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.StatusCount;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.mapper.LeadMapper;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.repository.LeadNoteRepository;
+import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.PermissionName;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
@@ -154,12 +155,25 @@ public class LeadService {
         if (currentUser == null) {
             throw new BusinessException("Usuário autenticado não encontrado");
         }
+        User userSended = userRepository.getReferenceById(userId);
+
         boolean isGerente = "GERENTE".equals(currentUser.getRole().getName()) ||
                 "ADMIN".equals(currentUser.getRole().getName());
-        UUID effectiveUserId = isGerente ? userId : currentUser.getId();
+
+        boolean isDiferent = !userSended.getId().equals(currentUser.getId());
+
+        UUID effectiveUserId = null;
+
+        if(isGerente && isDiferent ){
+            effectiveUserId = userId;
+        } else if(isGerente){
+            effectiveUserId = null;
+        } else {
+            effectiveUserId = currentUser.getId();
+        };
 
         Page<Lead> page = repository
-                .filter(search, status, isGerente ? null : userId, start, end, pageable);
+                .filter(search, status, effectiveUserId , start, end, pageable);
         List<UUID> listIds = page.getContent()
                 .stream()
                 .map(Lead::getId)
@@ -252,6 +266,9 @@ public class LeadService {
                 throw new BusinessException("Email já cadastrado");
             }
         }
+        if(!user.hasPermission(PermissionName.LEAD_EDIT_PHONE) && !dto.getTelefone().isEmpty()){
+            throw new BusinessException("Você não tem permissão para alterar o telefone");
+        }
         if (!lead.getTelefone().equals(dto.getTelefone()) &&
                 repository.existsByTelefone(dto.getTelefone())) {
             throw new BusinessException("Telefone já cadastrado");
@@ -287,7 +304,7 @@ public class LeadService {
     public void delete(UUID id) {
         User user = SecurityUtils.getCurrentUser();
 
-        if (!user.getRole().getName().equals("GERENTE")  || user.getRole().getName().equals("ADMIN")) {
+        if (user.getRole().getName().equals("CORRETOR")) {
             throw new BusinessException("Apenas gerentes podem deletar leads");
         }
 

@@ -5,6 +5,7 @@ import com.VastaImoveis.CRM.Exception.ResourceNotFoundException;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.UserBusinessRules.Permissions.Entity.Domain.PermissionName;
+import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.Entity.domain.LeadNote;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.Entity.dto.LeadNoteRequestDTO;
@@ -31,7 +32,8 @@ public class LeadNoteService {
     //Criar anotação
     public LeadNoteResponseDTO create(LeadNoteRequestDTO dto) {
         Lead lead = leadRepository.findById(dto.getLead()).orElseThrow(() -> new ResourceNotFoundException("Lead não encontrado"));
-        if (!lead.getUser().getId().equals(SecurityUtils.getCurrentUser().getId())) {
+        User user = SecurityUtils.getCurrentUser();
+        if (!lead.getUser().getId().equals(SecurityUtils.getCurrentUser().getId()) && user.getRole().getName().equalsIgnoreCase("CORRETOR")) {
             throw new BusinessException("Você não tem permissão para adicionar nota neste lead");
         }
         LeadNote leadNote = LeadNoteMapper.toEntity(dto);

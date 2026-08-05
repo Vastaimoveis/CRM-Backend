@@ -35,8 +35,8 @@ public class LeadNoteController {
         );
     }
 
-    @PreAuthorize("hasAuthority('NOTE_VIEW')")
     @GetMapping("/{leadId}")
+    @PreAuthorize("hasAuthority('NOTE_VIEW')")
     public ResponseEntity<ApiResponse<Page<LeadNoteResponseDTO>>> findByLeadId(
             @PathVariable UUID leadId,
             @PageableDefault(size = 30) Pageable pageable
@@ -48,8 +48,8 @@ public class LeadNoteController {
                 );
     }
 
-    @PreAuthorize("hasAuthority('NOTE_DELETE')")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('NOTE_DELETE')")
     public ResponseEntity<ApiResponse> deleteById(
             @PathVariable UUID id
     ){
