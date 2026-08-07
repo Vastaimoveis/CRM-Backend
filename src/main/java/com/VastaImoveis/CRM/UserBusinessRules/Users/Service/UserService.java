@@ -40,7 +40,7 @@ public class UserService {
     public UserResponseDTO create(UserRequestDTO dto) {
         User userAtual = SecurityUtils.getCurrentUser();
         assert userAtual != null;
-        if (userAtual.hasPermission(PermissionName.USER_CREATE)) {
+        if (!userAtual.hasPermission(PermissionName.USER_CREATE)) {
             throw new BusinessException("Você não tem permissão para criar um usuário");
         }
 
@@ -50,13 +50,14 @@ public class UserService {
         }
 
         String telefone = dto.getTelefone().toLowerCase().trim();
-
+        Role role = roleRepository.findById(dto.getRole())
+                .orElseThrow(() -> new BusinessException("Role não encontrada"));
         User user = new User();
         user.setNome(dto.getNome());
         user.setEmail(email);
         user.setTelefone(telefone);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
+        user.setRole(role);
         return toDTO(repository.save(user));
     }
 
