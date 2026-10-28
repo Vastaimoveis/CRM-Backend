@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
-@Order(2)
 public class RoleSeeder {
     @Bean
+    @Order(2)
     CommandLineRunner seedRoles(RoleRepository roleRepository, PermissionsRepository permissionRepository) {
         return args -> {
             syncRole(
@@ -58,7 +58,17 @@ public class RoleSeeder {
                             PermissionName.REMINDER_EDIT,
                             PermissionName.REMINDER_VIEW,
                             PermissionName.REMINDER_PATCH,
-                            PermissionName.REMINDER_DELETE
+                            PermissionName.REMINDER_DELETE,
+
+                            PermissionName.FOLLOWUP_VIEW,
+                            PermissionName.FOLLOWUP_VIEW_ALL,
+                            PermissionName.FOLLOWUP_CREATE,
+                            PermissionName.FOLLOWUP_EDIT,
+                            PermissionName.FOLLOWUP_RESCHEDULE,
+                            PermissionName.FOLLOWUP_VIEW_NEXT,
+                            PermissionName.FOLLOWUP_VIEW_USERS,
+                            PermissionName.FOLLOWUP_DELETE,
+                            PermissionName.FOLLOWUP_COMPLETE
                     ));
             syncRole(
                     roleRepository,
@@ -78,7 +88,13 @@ public class RoleSeeder {
                             PermissionName.REMINDER_DELETE,
 
                             PermissionName.NOTE_VIEW,
-                            PermissionName.NOTE_CREATE
+                            PermissionName.NOTE_CREATE,
+
+                            PermissionName.FOLLOWUP_VIEW,
+                            PermissionName.FOLLOWUP_VIEW_NEXT,
+                            PermissionName.FOLLOWUP_RESCHEDULE,
+                            PermissionName.FOLLOWUP_CREATE,
+                            PermissionName.FOLLOWUP_COMPLETE
                     ));
         };
     }

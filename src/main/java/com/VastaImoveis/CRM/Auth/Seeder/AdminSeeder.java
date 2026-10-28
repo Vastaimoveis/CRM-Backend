@@ -13,7 +13,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@Order(3)
 public class AdminSeeder {
     @Value("${ADMIN_EMAIL}")
     private String adminEmail;
@@ -21,6 +20,7 @@ public class AdminSeeder {
     private String adminPassword;
 
     @Bean
+    @Order(3)
     CommandLineRunner seedAdmin(UserRepository repo, RoleRepository roleRepository, PasswordEncoder encoder) {
         return args -> {
             if (repo.existsByEmail(adminEmail)) {

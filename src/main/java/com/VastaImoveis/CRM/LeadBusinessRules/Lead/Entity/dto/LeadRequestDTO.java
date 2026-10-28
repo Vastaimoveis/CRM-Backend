@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public class LeadRequestDTO {
 
     @NotBlank(message = "Nome é obrigatório")
@@ -23,6 +25,16 @@ public class LeadRequestDTO {
 
     @NotNull(message = "Origem é obrigatória")
     private OrigemLead origem;
+
+    private UUID userId;
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
 
     // Getters e Setters
     public OrigemLead getOrigem() {

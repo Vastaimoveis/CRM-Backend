@@ -6,5 +6,9 @@ public enum OrigemLead {
     FACEBOOK,
     GOOGLE,
     WHATSAPP,
+    INDICACAO,
+    INSTRAGRAM,
+    PLANTAO,
+    PANFLETAGEM,
     OUTROS
 }

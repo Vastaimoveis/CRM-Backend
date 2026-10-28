@@ -1,6 +1,7 @@
 package com.VastaImoveis.CRM.LeadBusinessRules.Lead.Service;
 
 import com.VastaImoveis.CRM.Exception.BusinessException;
+import com.VastaImoveis.CRM.LeadBusinessRules.FollowUp.Service.FollowUpService;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadDashboardDTO;
@@ -17,6 +18,7 @@ import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,25 +30,84 @@ public class LeadService {
     private final LeadRepository repository;
     private final LeadNoteRepository leadNoteRepository;
     private final UserRepository userRepository;
+    private final FollowUpService followUpService;
 
-    public LeadService(LeadRepository repository, LeadNoteRepository leadNoteRepository, UserRepository userRepository) {
+    public LeadService(
+            LeadRepository repository,
+            LeadNoteRepository leadNoteRepository,
+            UserRepository userRepository,
+            FollowUpService followUpService
+    ) {
         this.repository = repository;
         this.leadNoteRepository = leadNoteRepository;
         this.userRepository = userRepository;
+        this.followUpService = followUpService;
     }
 
+    @Transactional
     public LeadResponseDTO create(LeadRequestDTO dto) {
-        if (repository.existsByEmail(dto.getEmail()) && !dto.getEmail().isEmpty()) {
-            throw new BusinessException("Email já cadastrado");
+
+        // 1. Validar duplicidade de email
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            if (repository.existsByEmail(dto.getEmail())) {
+                throw new BusinessException("Email já cadastrado");
+            }
         }
+
+        // 2. Validar duplicidade de telefone
         if (repository.existsByTelefone(dto.getTelefone())) {
             throw new BusinessException("Telefone já cadastrado");
         }
 
-        User user = SecurityUtils.getCurrentUser();
+        // 3. Identificar usuário autenticado
+        User currentUser = SecurityUtils.getCurrentUser();
+
+        if (currentUser == null) {
+            throw new BusinessException(
+                    "Usuário autenticado não encontrado"
+            );
+        }
+
+        // 4. Atribuição padrão
+        User responsibleUser = currentUser;
+
+        // 5. Atribuição manual
+        if (dto.getUserId() != null) {
+
+            // Verificar permissão
+            if (!currentUser.hasPermission(PermissionName.LEAD_ASSIGN)) {
+                throw new BusinessException(
+                        "Você não possui permissão para atribuir Leads"
+                );
+            }
+
+            // Buscar usuário selecionado
+            User selectedUser = userRepository
+                    .findById(dto.getUserId())
+                    .orElseThrow(() ->
+                            new BusinessException(
+                                    "Corretor selecionado não encontrado"
+                            )
+                    );
+
+            // Validar cargo
+            if (!"CORRETOR".equals(selectedUser.getRole().getName())) {
+                throw new BusinessException(
+                        "O usuário selecionado não é um corretor"
+                );
+            }
+
+            responsibleUser = selectedUser;
+        }
+
+        // 6. Criar Lead
         Lead lead = LeadMapper.toEntity(dto);
-        lead.setUser(user);
+
+        lead.setUser(responsibleUser);
+
         Lead saved = repository.save(lead);
+        followUpService.createInitialFollowUp(saved);
+
         return LeadMapper.toDTO(saved);
     }
 
@@ -164,16 +225,17 @@ public class LeadService {
 
         UUID effectiveUserId = null;
 
-        if(isGerente && isDiferent ){
+        if (isGerente && isDiferent) {
             effectiveUserId = userId;
-        } else if(isGerente){
+        } else if (isGerente) {
             effectiveUserId = null;
         } else {
             effectiveUserId = currentUser.getId();
-        };
+        }
+        ;
 
         Page<Lead> page = repository
-                .filter(search, status, effectiveUserId , start, end, pageable);
+                .filter(search, status, effectiveUserId, start, end, pageable);
         List<UUID> listIds = page.getContent()
                 .stream()
                 .map(Lead::getId)
@@ -229,7 +291,7 @@ public class LeadService {
 
     public Page<LeadResponseDTO> findAllByUser(UUID userId, Pageable pageable) {
         User user = SecurityUtils.getCurrentUser();
-        if (!user.getRole().getName().equals("GERENTE")  || !user.getRole().getName().equals("ADMIN")) {
+        if (!user.getRole().getName().equals("GERENTE") || !user.getRole().getName().equals("ADMIN")) {
             throw new BusinessException("Você não tem permissão para essa chamada");
         }
         return repository.findByUserId(userId, pageable).map(LeadMapper::toDTO);
@@ -266,7 +328,7 @@ public class LeadService {
                 throw new BusinessException("Email já cadastrado");
             }
         }
-        if(!user.hasPermission(PermissionName.LEAD_EDIT_PHONE) && !dto.getTelefone().isEmpty()){
+        if (!user.hasPermission(PermissionName.LEAD_EDIT_PHONE) && !dto.getTelefone().isEmpty()) {
             throw new BusinessException("Você não tem permissão para alterar o telefone");
         }
         if (!lead.getTelefone().equals(dto.getTelefone()) &&
@@ -286,20 +348,45 @@ public class LeadService {
         return LeadMapper.toDTO(patched);
     }
 
-    public LeadResponseDTO patchLeadCorretor(UUID leadId, UUID userId) {
-        User userLogged = SecurityUtils.getCurrentUser();
-        boolean isGerente = userLogged.getRole().getName().equals("GERENTE");
-        if (!isGerente) {
-            throw new BusinessException("Você não tem permissão para alterar essa informação");
-        }
-        Lead lead = repository.findById(leadId)
-                .orElseThrow(() -> new BusinessException("Lead não encontrado em patch corretor"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException("user não encontrado em patch corretor"));
 
-        lead.setUser(user);
+    public LeadResponseDTO patchLeadCorretor(
+            UUID leadId,
+            UUID userId
+    ) {
+
+        User currentUser = SecurityUtils.getCurrentUser();
+
+        if (currentUser == null ||
+                !currentUser.hasPermission(PermissionName.LEAD_ASSIGN)) {
+
+            throw new BusinessException(
+                    "Você não possui permissão para atribuir Leads"
+            );
+        }
+
+        Lead lead = repository.findById(leadId)
+                .orElseThrow(() ->
+                        new BusinessException("Lead não encontrado")
+                );
+
+        User selectedUser = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new BusinessException("Corretor não encontrado")
+                );
+
+        if (!"CORRETOR".equals(selectedUser.getRole().getName())) {
+            throw new BusinessException(
+                    "O usuário selecionado não é um corretor"
+            );
+        }
+
+        lead.setUser(selectedUser);
+
         Lead patched = repository.save(lead);
+
         return LeadMapper.toDTO(patched);
     }
+
 
     public void delete(UUID id) {
         User user = SecurityUtils.getCurrentUser();
