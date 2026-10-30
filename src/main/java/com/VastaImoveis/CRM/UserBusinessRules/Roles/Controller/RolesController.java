@@ -22,8 +22,8 @@ public class RolesController {
         this.service = service;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
     public ResponseEntity<ApiResponse<RoleResponseDto>> createRole(RoleRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
@@ -34,8 +34,8 @@ public class RolesController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
     public ResponseEntity<ApiResponse<List<RoleResponseDto>>> findAll() {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponse<>(
@@ -46,8 +46,8 @@ public class RolesController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
     public ResponseEntity<ApiResponse<RoleResponseDto>> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
@@ -58,8 +58,8 @@ public class RolesController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping
+    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
     public ResponseEntity<ApiResponse> Delete(UUID id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
