@@ -148,7 +148,7 @@ public class FollowUpMapper {
         novo.setLead(anterior.getLead());
         novo.setFollowUpAtual(anterior.getFollowUpAtual());
         novo.setFollowUpTotal(anterior.getFollowUpTotal());
-        novo.setStatus(FollowUpStatus.PENDENTE);
+        novo.setStatus(FollowUpStatus.REAGENDADO);
         novo.setAtual(true);
         novo.setProximoContato(request.proximoContato());
         novo.setObservacao(request.observacao());

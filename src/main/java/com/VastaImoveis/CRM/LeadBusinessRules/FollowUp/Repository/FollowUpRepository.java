@@ -64,16 +64,16 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
     );
 
     @Query("""
-                SELECT COUNT(f)
-                FROM FollowUp f
-                WHERE f.atual = true
-                  AND f.lead.user.id = :userId
-                  AND f.status = :pendente
-                  AND f.proximoContato < :inicioDeHoje
-            """)
+    SELECT COUNT(f)
+    FROM FollowUp f
+    WHERE f.atual = true
+      AND f.lead.user.id = :userId
+      AND f.status = :status
+      AND f.proximoContato < :inicioDeHoje
+""")
     Long countAtrasadosByUser(
             @Param("userId") UUID userId,
-            @Param("pendente") FollowUpStatus pendente,
+            @Param("status") FollowUpStatus status,
             @Param("inicioDeHoje") LocalDateTime inicioDeHoje
     );
 
@@ -100,7 +100,7 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
             
                     OR (
                         :status = :atrasado
-                        AND f.status = :pendente
+                        AND f.status IN (:pendente, :reagendado)
                         AND f.proximoContato < :inicioDeHoje
                     )
             
@@ -114,8 +114,18 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
                     )
             
                     OR (
+                        :status = :reagendado
+                        AND f.status = :reagendado
+                        AND (
+                            f.proximoContato >= :inicioDeHoje
+                            OR f.proximoContato IS NULL
+                        )
+                    )
+                    
+                    OR (
                         :status <> :pendente
                         AND :status <> :atrasado
+                        AND :status <> :reagendado
                         AND f.status = :status
                     )
                 )
@@ -137,6 +147,7 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("pendente") FollowUpStatus pendente,
+            @Param("reagendado") FollowUpStatus reagendado,
             @Param("atrasado") FollowUpStatus atrasado,
             @Param("inicioDeHoje") LocalDateTime inicioDeHoje,
             Pageable pageable
@@ -159,14 +170,14 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
     );
 
     @Query("""
-                SELECT COUNT(f)
-                FROM FollowUp f
-                WHERE f.atual = true
-                  AND f.status = :pendente
-                  AND f.proximoContato < :inicioDeHoje
-            """)
+    SELECT COUNT(f)
+    FROM FollowUp f
+    WHERE f.atual = true
+      AND f.status = :status
+      AND f.proximoContato < :inicioDeHoje
+""")
     Long countAllAtrasados(
-            @Param("pendente") FollowUpStatus pendente,
+            @Param("status") FollowUpStatus status,
             @Param("inicioDeHoje") LocalDateTime inicioDeHoje
     );
 

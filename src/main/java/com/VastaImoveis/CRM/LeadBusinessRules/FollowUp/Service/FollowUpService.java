@@ -217,46 +217,30 @@ public class FollowUpService {
 
         LocalDateTime inicioDeHoje = LocalDate.now().atStartOfDay();
 
-        // Busca a contagem original de todos os status
+        // Busca a contagem original agrupada por status
         List<FollowUpStatusCountDTO> counts =
                 followUpRepository.countCurrentByStatusAndUser(userId);
 
-        // Busca quantos pendentes estão atrasados
-        Long atrasados = followUpRepository.countAtrasadosByUser(
+        // Conta os pendentes que estão atrasados
+        Long pendentesAtrasados = followUpRepository.countAtrasadosByUser(
                 userId,
                 FollowUpStatus.PENDENTE,
                 inicioDeHoje
         );
 
-        // Reconstrói a contagem com os status efetivos
-        List<FollowUpStatusCountDTO> resultado = new ArrayList<>();
-
-        for (FollowUpStatusCountDTO count : counts) {
-
-            if (count.status() == FollowUpStatus.PENDENTE) {
-
-                resultado.add(
-                        new FollowUpStatusCountDTO(
-                                FollowUpStatus.PENDENTE,
-                                count.quantidade() - atrasados
-                        )
-                );
-
-            } else if (count.status() != FollowUpStatus.ATRASADO) {
-
-                resultado.add(count);
-            }
-        }
-
-        // Adiciona os atrasados calculados dinamicamente
-        resultado.add(
-                new FollowUpStatusCountDTO(
-                        FollowUpStatus.ATRASADO,
-                        atrasados
-                )
+        // Conta os reagendados que estão atrasados
+        Long reagendadosAtrasados = followUpRepository.countAtrasadosByUser(
+                userId,
+                FollowUpStatus.REAGENDADO,
+                inicioDeHoje
         );
 
-        return resultado;
+        // Reconstrói as quantidades com os status efetivos
+        return calcularStatusEfetivos(
+                counts,
+                pendentesAtrasados,
+                reagendadosAtrasados
+        );
     }
 
     // Conclui o contato e salva o atraso histórico.
@@ -266,11 +250,8 @@ public class FollowUpService {
 
         exigirFollowUpAtual(followUp);
 
-        exigirStatus(
-                followUp,
-                FollowUpStatus.PENDENTE,
-                "Somente contatos pendentes podem ser concluídos"
-        );
+        exigirStatusAcionavel(
+                followUp);
 
         LocalDateTime agora = LocalDateTime.now();
 
@@ -301,11 +282,8 @@ public class FollowUpService {
 
         exigirFollowUpAtual(anterior);
 
-        exigirStatus(
-                anterior,
-                FollowUpStatus.PENDENTE,
-                "Somente contatos pendentes podem ser reagendados"
-        );
+        exigirStatusAcionavel(
+                anterior);
 
         // Valida a data e prepara o novo registro antes das alterações.
         FollowUp novo = FollowUpMapper.reagendarMapper(
@@ -344,11 +322,8 @@ public class FollowUpService {
 
         exigirFollowUpAtual(anterior);
 
-        exigirStatus(
-                anterior,
-                FollowUpStatus.PENDENTE,
-                "O contato anterior precisa estar pendente."
-        );
+        exigirStatusAcionavel(
+                anterior);
 
         if (anterior.getFollowUpAtual()
                 >= anterior.getFollowUpTotal()) {
@@ -388,16 +363,17 @@ public class FollowUpService {
                         ));
     }
 
-    private void exigirStatus(
-            FollowUp followUp,
-            FollowUpStatus esperado,
-            String mensagem
-    ) {
-        if (followUp.getStatus() != esperado) {
-            throw new IllegalStateException(mensagem);
+    private void exigirStatusAcionavel(FollowUp followUp) {
+
+        if (
+                followUp.getStatus() != FollowUpStatus.PENDENTE &&
+                        followUp.getStatus() != FollowUpStatus.REAGENDADO
+        ) {
+            throw new IllegalStateException(
+                    "Somente Follow-ups pendentes ou reagendados podem realizar esta operação"
+            );
         }
     }
-
 
     // Follow-ups do usuário autenticado
     @Transactional(readOnly = true)
@@ -482,6 +458,7 @@ public class FollowUpService {
                 inicio,
                 fim,
                 FollowUpStatus.PENDENTE,
+                FollowUpStatus.REAGENDADO,
                 FollowUpStatus.ATRASADO,
                 inicioDeHoje,
                 pageable
@@ -521,11 +498,8 @@ public class FollowUpService {
 
         exigirFollowUpAtual(followUp);
 
-        exigirStatus(
-                followUp,
-                FollowUpStatus.PENDENTE,
-                "Somente Follow-ups pendentes podem ser cancelados"
-        );
+        exigirStatusAcionavel(
+                followUp);
 
         LocalDateTime agora = LocalDateTime.now();
 
@@ -549,31 +523,37 @@ public class FollowUpService {
 
     private List<FollowUpStatusCountDTO> calcularStatusEfetivos(
             List<FollowUpStatusCountDTO> counts,
-            Long atrasados
+            Long pendentesAtrasados,
+            Long reagendadosAtrasados
     ) {
         List<FollowUpStatusCountDTO> resultado = new ArrayList<>();
 
         for (FollowUpStatusCountDTO count : counts) {
 
-            if (count.status() == FollowUpStatus.PENDENTE) {
+            long quantidade = count.quantidade();
 
+            if (count.status() == FollowUpStatus.PENDENTE) {
+                quantidade -= pendentesAtrasados;
+            }
+
+            if (count.status() == FollowUpStatus.REAGENDADO) {
+                quantidade -= reagendadosAtrasados;
+            }
+
+            if (count.status() != FollowUpStatus.ATRASADO) {
                 resultado.add(
                         new FollowUpStatusCountDTO(
-                                FollowUpStatus.PENDENTE,
-                                count.quantidade() - atrasados
+                                count.status(),
+                                quantidade
                         )
                 );
-
-            } else if (count.status() != FollowUpStatus.ATRASADO) {
-
-                resultado.add(count);
             }
         }
 
         resultado.add(
                 new FollowUpStatusCountDTO(
                         FollowUpStatus.ATRASADO,
-                        atrasados
+                        pendentesAtrasados + reagendadosAtrasados
                 )
         );
 
@@ -591,14 +571,22 @@ public class FollowUpService {
         List<FollowUpStatusCountDTO> counts =
                 followUpRepository.countCurrentByStatus();
 
-        Long atrasados = followUpRepository.countAllAtrasados(
+        Long pendentesAtrasados = followUpRepository.countAllAtrasados(
                 FollowUpStatus.PENDENTE,
                 inicioDeHoje
         );
 
-        List<FollowUpStatusCountDTO> statusEfetivos =
-                calcularStatusEfetivos(counts, atrasados);
+        Long reagendadosAtrasados = followUpRepository.countAllAtrasados(
+                FollowUpStatus.REAGENDADO,
+                inicioDeHoje
+        );
 
+        List<FollowUpStatusCountDTO> statusEfetivos =
+                calcularStatusEfetivos(
+                        counts,
+                        pendentesAtrasados,
+                        reagendadosAtrasados
+                );
         Long todayCount = followUpRepository.countAllToday(
                 FollowUpStatus.PENDENTE,
                 inicioDeHoje,
