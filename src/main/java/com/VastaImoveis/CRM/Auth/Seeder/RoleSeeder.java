@@ -63,6 +63,7 @@ public class RoleSeeder {
                             PermissionName.FOLLOWUP_VIEW,
                             PermissionName.FOLLOWUP_VIEW_ALL,
                             PermissionName.FOLLOWUP_CREATE,
+                            PermissionName.FOLLOWUP_CANCEL,
                             PermissionName.FOLLOWUP_EDIT,
                             PermissionName.FOLLOWUP_RESCHEDULE,
                             PermissionName.FOLLOWUP_VIEW_NEXT,
@@ -93,6 +94,7 @@ public class RoleSeeder {
                             PermissionName.FOLLOWUP_VIEW,
                             PermissionName.FOLLOWUP_VIEW_NEXT,
                             PermissionName.FOLLOWUP_RESCHEDULE,
+                            PermissionName.FOLLOWUP_CANCEL,
                             PermissionName.FOLLOWUP_CREATE,
                             PermissionName.FOLLOWUP_COMPLETE
                     ));

@@ -228,7 +228,7 @@ public class FollowUpController {
             Authentication authentication
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
                         true,
                         service.getMySummary(authentication),
@@ -299,7 +299,7 @@ public class FollowUpController {
                         pageable
                 );
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
                         true,
                         resultado,
@@ -360,7 +360,7 @@ public class FollowUpController {
 
         FollowUpResponseDTO cancelled = service.cancelar(id);
 
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
                         true,
                         cancelled,

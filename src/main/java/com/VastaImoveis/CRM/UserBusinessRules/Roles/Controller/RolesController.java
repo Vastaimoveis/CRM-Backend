@@ -35,9 +35,9 @@ public class RolesController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
+    @PreAuthorize("hasAnyAuthority('USER_VIEW')")
     public ResponseEntity<ApiResponse<List<RoleResponseDto>>> findAll() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
                         true,
                         service.findAll(),
@@ -47,7 +47,7 @@ public class RolesController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
+    @PreAuthorize("hasAnyAuthority('USER_VIEW')")
     public ResponseEntity<ApiResponse<RoleResponseDto>> findById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponse<>(
@@ -59,7 +59,7 @@ public class RolesController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasAnyAuthority('USER_CREATE')")
+    @PreAuthorize("hasAnyAuthority('USER_DELETE')")
     public ResponseEntity<ApiResponse> Delete(UUID id) {
         service.delete(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(
