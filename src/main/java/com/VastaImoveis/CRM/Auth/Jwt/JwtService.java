@@ -24,8 +24,11 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("role", user.getRole().getName())
+                .claim("type", "access")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .setExpiration(new Date(
+                        System.currentTimeMillis() + 1000L * 60 * 15
+                ))
                 .signWith(getSignKey())
                 .compact();
     }
@@ -65,8 +68,19 @@ public class JwtService {
 
     public boolean isTokenValid(String token, User user) {
         try {
-            String email = extractEmail(token);
-            return email.equals(user.getEmail()) && !isTokenExpired(token);
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String email = claims.getSubject();
+            String type = claims.get("type", String.class);
+
+            return email.equals(user.getEmail())
+                    && "access".equals(type)
+                    && claims.getExpiration().after(new Date());
+
         } catch (Exception e) {
             return false;
         }

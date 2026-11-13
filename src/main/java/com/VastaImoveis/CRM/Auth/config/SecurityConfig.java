@@ -2,6 +2,7 @@ package com.VastaImoveis.CRM.Auth.config;
 
 import com.VastaImoveis.CRM.Auth.Buckets.RateLimitFilter;
 import com.VastaImoveis.CRM.Auth.Jwt.JwtFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,6 +67,20 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/public/leads").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(
+                                    HttpServletResponse.SC_UNAUTHORIZED,
+                                    "Não autenticado ou token inválido"
+                            );
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendError(
+                                    HttpServletResponse.SC_FORBIDDEN,
+                                    "Você não possui permissão para acessar este recurso"
+                            );
+                        })
                 );
         return http.build();
     }

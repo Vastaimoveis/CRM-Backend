@@ -85,8 +85,9 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // 🔥 importante: não quebra a request inteira
-
+            System.err.println(
+                    "Erro ao validar JWT: " + e.getMessage()
+            );
         }
 
         filterChain.doFilter(request, response);

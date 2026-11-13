@@ -1,26 +1,57 @@
 package com.VastaImoveis.CRM.shared.utils;
 
 public class ApiResponse<T> {
-    private final boolean success;
-    private final T data;
-    private  String errorCode;
-    private final String text;
-    public ApiResponse(boolean success,T data, String text) {
+
+    private boolean success;
+    private T data;
+    private String message;
+    private String errorCode;
+
+    // Construtor para sucesso e respostas antigas
+    public ApiResponse(boolean success, T data, String message) {
         this.success = success;
         this.data = data;
-        this.text = text;
+        this.message = message;
+        this.errorCode = null;
+    }
+
+    // Construtor para erros identificados
+    public ApiResponse(
+            boolean success,
+            T data,
+            String message,
+            String errorCode
+    ) {
+        this.success = success;
+        this.data = data;
+        this.message = message;
+        this.errorCode = errorCode;
+    }
+
+    // getters e setters
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public T getData() {
         return data;
     }
 
-    public String getText() {
-        return text;
+    public void setData(T data) {
+        this.data = data;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getErrorCode() {

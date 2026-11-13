@@ -1,13 +1,11 @@
 package com.VastaImoveis.CRM.LeadBusinessRules.Lead.Service;
 
 import com.VastaImoveis.CRM.Exception.BusinessException;
+import com.VastaImoveis.CRM.Exception.ErrorCode;
 import com.VastaImoveis.CRM.LeadBusinessRules.FollowUp.Service.FollowUpService;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead;
-import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadDashboardDTO;
-import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadRequestDTO;
-import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadResponseDTO;
-import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.StatusCount;
+import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.*;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Repository.LeadRepository;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.mapper.LeadMapper;
 import com.VastaImoveis.CRM.LeadBusinessRules.LeadNotes.repository.LeadNoteRepository;
@@ -17,6 +15,7 @@ import com.VastaImoveis.CRM.shared.utils.SecurityUtils;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,13 +49,32 @@ public class LeadService {
         // 1. Validar duplicidade de email
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             if (repository.existsByEmail(dto.getEmail())) {
-                throw new BusinessException("Email já cadastrado");
+                throw new BusinessException(
+                        "Este email já está cadastrado.",
+                        ErrorCode.LEAD_EMAIL_DUPLICATE
+                );
             }
         }
 
+
         // 2. Validar duplicidade de telefone
         if (repository.existsByTelefone(dto.getTelefone())) {
-            throw new BusinessException("Telefone já cadastrado");
+            Lead leadBuscado = repository.findByTelefone(dto.getTelefone())
+                    .orElseThrow(() ->
+                            new BusinessException("Telefone já cadastrado mas lead não encontrado, chamar gerente"));
+            User currentUser = SecurityUtils.getCurrentUser();
+
+            if (leadBuscado.getUser().equals(currentUser)) {
+                throw new BusinessException(
+                        "Este telefone já está cadastrado no seu CRM.",
+                        ErrorCode.LEAD_PHONE_DUPLICATE
+                );
+            } else {
+                throw new BusinessException(
+                        "Este telefone já está cadastrado, Chamar gerente.",
+                        ErrorCode.LEAD_PHONE_DUPLICATE
+                );
+            }
         }
 
         // 3. Identificar usuário autenticado
@@ -64,7 +82,9 @@ public class LeadService {
 
         if (currentUser == null) {
             throw new BusinessException(
-                    "Usuário autenticado não encontrado"
+                    "Não foi possível identificar o usuário autenticado.",
+                    ErrorCode.AUTH_USER_NOT_FOUND,
+                    HttpStatus.UNAUTHORIZED
             );
         }
 
@@ -74,26 +94,28 @@ public class LeadService {
         // 5. Atribuição manual
         if (dto.getUserId() != null) {
 
-            // Verificar permissão
             if (!currentUser.hasPermission(PermissionName.LEAD_ASSIGN)) {
                 throw new BusinessException(
-                        "Você não possui permissão para atribuir Leads"
+                        "Você não possui permissão para atribuir leads.",
+                        ErrorCode.LEAD_ASSIGN_FORBIDDEN,
+                        HttpStatus.FORBIDDEN
                 );
             }
 
-            // Buscar usuário selecionado
             User selectedUser = userRepository
                     .findById(dto.getUserId())
                     .orElseThrow(() ->
                             new BusinessException(
-                                    "Corretor selecionado não encontrado"
+                                    "O corretor selecionado não foi encontrado.",
+                                    ErrorCode.LEAD_CORRETOR_NOT_FOUND,
+                                    HttpStatus.NOT_FOUND
                             )
                     );
 
-            // Validar cargo
             if (!"CORRETOR".equals(selectedUser.getRole().getName())) {
                 throw new BusinessException(
-                        "O usuário selecionado não é um corretor"
+                        "O usuário selecionado não é um corretor.",
+                        ErrorCode.LEAD_USER_NOT_CORRETOR
                 );
             }
 
@@ -110,7 +132,6 @@ public class LeadService {
 
         return LeadMapper.toDTO(saved);
     }
-
 
     public Page<LeadResponseDTO> findAllWithPage(Pageable pageable) {
 
@@ -216,23 +237,14 @@ public class LeadService {
         if (currentUser == null) {
             throw new BusinessException("Usuário autenticado não encontrado");
         }
-        User userSended = userRepository.getReferenceById(userId);
 
-        boolean isGerente = "GERENTE".equals(currentUser.getRole().getName()) ||
-                "ADMIN".equals(currentUser.getRole().getName());
+        boolean isGerente =
+                "GERENTE".equals(currentUser.getRole().getName()) ||
+                        "ADMIN".equals(currentUser.getRole().getName());
 
-        boolean isDiferent = !userSended.getId().equals(currentUser.getId());
-
-        UUID effectiveUserId = null;
-
-        if (isGerente && isDiferent) {
-            effectiveUserId = userId;
-        } else if (isGerente) {
-            effectiveUserId = null;
-        } else {
-            effectiveUserId = currentUser.getId();
-        }
-        ;
+        UUID effectiveUserId = isGerente
+                ? userId
+                : currentUser.getId();
 
         Page<Lead> page = repository
                 .filter(search, status, effectiveUserId, start, end, pageable);
@@ -444,5 +456,56 @@ public class LeadService {
         return new LeadDashboardDTO(total, porStatus);
     }
 
+    public List<LeadPorCorretorCount> buscarLeadsPorCorretor(
+            LocalDate startDate,
+            LocalDate endDate,
+            UUID userId
+    ) {
+        User currentUser = SecurityUtils.getCurrentUser();
+
+        if (currentUser == null) {
+            throw new BusinessException(
+                    "Usuário autenticado não encontrado"
+            );
+        }
+
+        boolean isManager =
+                "GERENTE".equals(currentUser.getRole().getName()) ||
+                        "ADMIN".equals(currentUser.getRole().getName());
+
+        // Corretor só pode consultar os próprios leads.
+        UUID effectiveUserId = isManager
+                ? userId
+                : currentUser.getId();
+
+        // Datas padrão: início e fim do mês atual.
+        LocalDate hoje = LocalDate.now();
+
+        LocalDate inicio = startDate != null
+                ? startDate
+                : hoje.withDayOfMonth(1);
+
+        LocalDate fim = endDate != null
+                ? endDate
+                : hoje;
+
+        if (inicio.isAfter(fim)) {
+            throw new BusinessException(
+                    "A data inicial não pode ser posterior à data final"
+            );
+        }
+
+        LocalDateTime inicioDateTime = inicio.atStartOfDay();
+
+        LocalDateTime fimDateTime = fim
+                .plusDays(1)
+                .atStartOfDay();
+
+        return repository.countLeadsByCorretorAndCreatedAt(
+                inicioDateTime,
+                fimDateTime,
+                effectiveUserId
+        );
+    }
 
 }

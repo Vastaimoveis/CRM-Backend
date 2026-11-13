@@ -2,6 +2,7 @@ package com.VastaImoveis.CRM.LeadBusinessRules.Lead.Repository;
 
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.Lead;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.Domain.StatusLead;
+import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadPorCorretorCount;
 import com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.StatusCount;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 import org.springframework.data.domain.Page;
@@ -133,4 +134,28 @@ ORDER BY l.createdAt DESC
         */
 
     Optional<Lead> findByTelefone(String telefone);
+
+    @Query("""
+    SELECT new com.VastaImoveis.CRM.LeadBusinessRules.Lead.Entity.dto.LeadPorCorretorCount(
+        l.user.id,
+        l.user.nome,
+        COUNT(l)
+    )
+    FROM Lead l
+    WHERE
+        l.user IS NOT NULL
+        AND l.createdAt >= :startDate
+        AND l.createdAt < :endDate
+        AND (
+            :userId IS NULL
+            OR l.user.id = :userId
+        )
+    GROUP BY l.user.id, l.user.nome
+    ORDER BY COUNT(l) DESC
+""")
+    List<LeadPorCorretorCount> countLeadsByCorretorAndCreatedAt(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("userId") UUID userId
+    );
 }

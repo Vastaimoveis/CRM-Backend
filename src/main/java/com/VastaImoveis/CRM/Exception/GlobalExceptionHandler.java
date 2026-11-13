@@ -42,7 +42,8 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
-                null
+                null,
+                ErrorCode.RESOURCE_NOT_FOUND
         );
     }
 
@@ -53,9 +54,10 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildResponse(
-                HttpStatus.BAD_REQUEST,
+                ex.getHttpStatus(),
                 ex.getMessage(),
-                null
+                null,
+                ex.getErrorCode()
         );
     }
 
@@ -65,7 +67,6 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors()
@@ -75,8 +76,9 @@ public class GlobalExceptionHandler {
 
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
-                "Campos inválidos",
-                errors
+                "Verifique os campos informados.",
+                errors,
+                ErrorCode.VALIDATION_ERROR
         );
     }
 
@@ -90,8 +92,9 @@ public class GlobalExceptionHandler {
 
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Erro interno inesperado",
-                null
+                "Ocorreu um erro inesperado. Tente novamente.",
+                null,
+                ErrorCode.INTERNAL_SERVER_ERROR
         );
     }
 
@@ -106,12 +109,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(Exception ex, HttpServletRequest request) {
-        log.error("Acesso negado: {}", ex.getMessage());
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        log.warn("Acesso negado: {}", ex.getMessage());
+
         return buildResponse(
                 HttpStatus.FORBIDDEN,
-                "Acesso negado",
-                null
+                "Você não possui permissão para realizar esta operação.",
+                null,
+                ErrorCode.ACCESS_DENIED
         );
     }
 
@@ -134,4 +142,22 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    private ResponseEntity<ApiResponse<Object>> buildResponse(
+            HttpStatus status,
+            String message,
+            Object data,
+            ErrorCode errorCode
+    ) {
+        return ResponseEntity.status(status)
+                .body(
+                        new ApiResponse<>(
+                                false,
+                                data,
+                                message,
+                                errorCode.name()
+                        )
+                );
+    }
+
 }

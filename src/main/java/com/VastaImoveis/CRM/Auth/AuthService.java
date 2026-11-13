@@ -12,14 +12,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public AuthService(UserRepository repository,
-                       PasswordEncoder passwordEncoder,
-                       JwtService jwtService,
-                       UserRepository userRepository) {
+    public AuthService(
+            UserRepository repository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -33,30 +35,23 @@ public class AuthService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidPasswordException();
         }
+
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.gerenateRefreshToken(user);
 
         return new AuthResult(token, refreshToken, user);
     }
-    public String refreshToken(User user){
 
-        return jwtService.generateToken(user);
-    }
+    public String extractEmailFromRefreshToken(String refreshToken) {
 
-
-
-    public String extractEmailFromRefreshToken(
-            String refreshToken
-    ) {
         if (!jwtService.isRefreshToken(refreshToken)) {
             throw new InvalidCredentialsException();
         }
+
         return jwtService.extractEmail(refreshToken);
     }
 
-    public String generateNewAccessToken(
-            String email
-    ) {
+    public String generateNewAccessToken(String email) {
 
         User user = repository.findByEmail(email)
                 .orElseThrow(InvalidCredentialsException::new);

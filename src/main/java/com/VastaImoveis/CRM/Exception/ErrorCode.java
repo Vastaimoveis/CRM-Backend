@@ -1,0 +1,24 @@
+package com.VastaImoveis.CRM.Exception;
+
+public enum ErrorCode {
+
+    // Leads
+    LEAD_EMAIL_DUPLICATE,
+    LEAD_PHONE_DUPLICATE,
+    LEAD_ASSIGN_FORBIDDEN,
+    LEAD_CORRETOR_NOT_FOUND,
+    LEAD_USER_NOT_CORRETOR,
+
+    // Autenticação e autorização
+    AUTH_USER_NOT_FOUND,
+    AUTH_INVALID_CREDENTIALS,
+    AUTH_INVALID_EMAIL,
+    AUTH_INVALID_PASSWORD,
+    ACCESS_DENIED,
+
+    // Validação e erros gerais
+    VALIDATION_ERROR,
+    RESOURCE_NOT_FOUND,
+    INTERNAL_SERVER_ERROR,
+    BUSINESS_RULE_VIOLATION
+}

@@ -123,6 +123,29 @@ public class LeadController {
                 );
     }
 
+    @GetMapping("/por-corretor")
+    @PreAuthorize("hasAuthority('LEAD_VIEW')")
+    public ResponseEntity<ApiResponse<List<LeadPorCorretorCount>>> buscarLeadsPorCorretor(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) UUID userId
+    ) {
+        List<LeadPorCorretorCount> resultado =
+                service.buscarLeadsPorCorretor(
+                        startDate,
+                        endDate,
+                        userId
+                );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        resultado,
+                        "Leads agrupados por corretor encontrados com sucesso"
+                )
+        );
+    }
+
     @GetMapping("/debug-auth")
     @PreAuthorize("hasAuthority('LEAD_VIEW')")
     public Object debug(Authentication authentication) {
@@ -134,7 +157,7 @@ public class LeadController {
     public ResponseEntity<ApiResponse<Page<LeadResponseDTO>>> filter(
             @RequestParam(name = "search", required = false) String search,
             @RequestParam(name = "status", required = false) StatusLead status,
-            @RequestParam(name = "userid", required = false) UUID userId,
+            @RequestParam(name = "userId", required = false) UUID userId,
             @RequestParam(name = "startDate", required = false) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) LocalDate endDate,
             @PageableDefault(size = 15) Pageable pageable

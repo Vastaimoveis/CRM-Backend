@@ -69,7 +69,13 @@ public class RoleSeeder {
                             PermissionName.FOLLOWUP_VIEW_NEXT,
                             PermissionName.FOLLOWUP_VIEW_USERS,
                             PermissionName.FOLLOWUP_DELETE,
-                            PermissionName.FOLLOWUP_COMPLETE
+                            PermissionName.FOLLOWUP_COMPLETE,
+
+                            PermissionName.SCRIPT_VIEW,
+                            PermissionName.SCRIPT_VIEW_ALL,
+                            PermissionName.SCRIPT_CREATE,
+                            PermissionName.SCRIPT_EDIT,
+                            PermissionName.SCRIPT_DELETE
                     ));
             syncRole(
                     roleRepository,
@@ -96,7 +102,12 @@ public class RoleSeeder {
                             PermissionName.FOLLOWUP_RESCHEDULE,
                             PermissionName.FOLLOWUP_CANCEL,
                             PermissionName.FOLLOWUP_CREATE,
-                            PermissionName.FOLLOWUP_COMPLETE
+                            PermissionName.FOLLOWUP_COMPLETE,
+
+                            PermissionName.SCRIPT_VIEW,
+                            PermissionName.SCRIPT_CREATE,
+                            PermissionName.SCRIPT_EDIT,
+                            PermissionName.SCRIPT_DELETE
                     ));
         };
     }
