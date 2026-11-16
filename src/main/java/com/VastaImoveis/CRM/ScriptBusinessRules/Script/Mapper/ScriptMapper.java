@@ -23,6 +23,7 @@ public class ScriptMapper {
                 entity.getTitle(),
                 entity.getMessage(),
                 entity.getUser().getId(),
+                entity.getCategory(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

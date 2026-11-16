@@ -2,6 +2,7 @@
 package com.VastaImoveis.CRM.ScriptBusinessRules.Script.Repository;
 
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.Script;
+import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.ScriptCategories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,6 +31,9 @@ public interface ScriptRepository extends JpaRepository<Script, UUID> {
 
     // Verifica se o script pertence ao usuário
     boolean existsByIdAndUser_Id(UUID id, UUID userId);
+
+    //Filtra por categoria
+    Page<Script> findByUser_IdAndCategory(UUID userId, ScriptCategories category, Pageable pageable);
 
     // Exclui um script somente se pertencer ao usuário
     void deleteByIdAndUser_Id(UUID id, UUID userId);

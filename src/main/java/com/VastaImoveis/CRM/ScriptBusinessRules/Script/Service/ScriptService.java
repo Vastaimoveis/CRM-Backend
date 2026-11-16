@@ -2,6 +2,7 @@
 package com.VastaImoveis.CRM.ScriptBusinessRules.Script.Service;
 
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.Script;
+import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.ScriptCategories;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptCreateDTO;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptResponseDTO;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptUpdateDTO;
@@ -62,6 +63,14 @@ public class ScriptService {
         User user = getCurrentUser();
 
         return repository.findAllByUser_Id(user.getId(), pageable)
+                .map(ScriptMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ScriptResponseDTO> filterCategory(ScriptCategories category, Pageable pageable) {
+        User user = getCurrentUser();
+
+        return repository.findByUser_IdAndCategory(user.getId(), category, pageable)
                 .map(ScriptMapper::toResponse);
     }
 

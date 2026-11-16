@@ -1,6 +1,7 @@
 
 package com.VastaImoveis.CRM.ScriptBusinessRules.Script.Controller;
 
+import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.ScriptCategories;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptCreateDTO;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptResponseDTO;
 import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto.ScriptUpdateDTO;
@@ -70,6 +71,29 @@ public class ScriptController {
                         true,
                         service.search(query, pageable),
                         "Scripts encontrados com sucesso"
+                )
+        );
+    }
+
+    @GetMapping("/filter")
+    @PreAuthorize("hasAuthority('SCRIPT_VIEW')")
+    public ResponseEntity<ApiResponse<Page<ScriptResponseDTO>>> filter(
+            @RequestParam(required = false) ScriptCategories category,
+            Pageable pageable
+    ) {
+        Page<ScriptResponseDTO> scripts;
+
+        if (category == null) {
+            scripts = service.findAll(pageable);
+        } else {
+            scripts = service.filterCategory(category, pageable);
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        scripts,
+                        "Scripts filtrados com sucesso"
                 )
         );
     }

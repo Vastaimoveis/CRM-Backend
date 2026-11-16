@@ -1,5 +1,6 @@
 package com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Dto;
 
+import com.VastaImoveis.CRM.ScriptBusinessRules.Script.Entity.Domain.ScriptCategories;
 import com.VastaImoveis.CRM.UserBusinessRules.Users.Entity.Domain.User;
 
 import java.time.LocalDateTime;
@@ -14,17 +15,20 @@ public class ScriptResponseDTO {
 
     private UUID user;
 
+    private ScriptCategories categories;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     public ScriptResponseDTO(){}
 
-    public ScriptResponseDTO(UUID id, String title, String message, UUID user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ScriptResponseDTO(UUID id, String title, String message, UUID user, ScriptCategories categories, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.message = message;
         this.user = user;
+        this.categories = categories;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -59,6 +63,14 @@ public class ScriptResponseDTO {
 
     public void setUser(UUID user) {
         this.user = user;
+    }
+
+    public ScriptCategories getCategories() {
+        return categories;
+    }
+
+    public void setCategories(ScriptCategories categories) {
+        this.categories = categories;
     }
 
     public LocalDateTime getCreatedAt() {
