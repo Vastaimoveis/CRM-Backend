@@ -238,14 +238,16 @@ public class LeadService {
             throw new BusinessException("Usuário autenticado não encontrado");
         }
 
-        boolean isGerente =
-                "GERENTE".equals(currentUser.getRole().getName()) ||
-                        "ADMIN".equals(currentUser.getRole().getName());
+        boolean canViewAllLeads = currentUser.getRole()
+                .getPermissions()
+                .stream()
+                .anyMatch(permission ->
+                        permission.getName() == PermissionName.LEAD_ASSIGN
+                );
 
-        UUID effectiveUserId = isGerente
+        UUID effectiveUserId = canViewAllLeads
                 ? userId
                 : currentUser.getId();
-
         Page<Lead> page = repository
                 .filter(search, status, effectiveUserId, start, end, pageable);
         List<UUID> listIds = page.getContent()
