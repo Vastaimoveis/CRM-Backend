@@ -180,14 +180,16 @@ public class FollowUpController {
     }
 
     @GetMapping("/current/count-by-status")
-    @PreAuthorize("hasAuthority('FOLLOWUP_VIEW_ALL')")
-    public ResponseEntity<ApiResponse<FollowUpSummaryDTO>> countCurrentByStatus() {
-
+    @PreAuthorize("hasAnyAuthority('FOLLOWUP_VIEW', 'FOLLOWUP_VIEW_ALL')")
+    public ResponseEntity<ApiResponse<FollowUpSummaryDTO>> countCurrentByStatus(
+            Authentication authentication,
+            @RequestParam(required = false) UUID userId
+    ) {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
-                        service.getAllSummary(),
-                        "Resumo geral dos Follow-ups consultado com sucesso"
+                        service.getSummary(authentication, userId),
+                        "Resumo dos Follow-ups consultado com sucesso"
                 )
         );
     }
@@ -222,31 +224,6 @@ public class FollowUpController {
         );
     }
 
-    @GetMapping("/current/me/count-by-status")
-    @PreAuthorize("hasAuthority('FOLLOWUP_VIEW')")
-    public ResponseEntity<ApiResponse<FollowUpSummaryDTO>> countMyCurrentByStatus(
-            Authentication authentication
-    ) {
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ApiResponse<>(
-                        true,
-                        service.getMySummary(authentication),
-                        "Resumo dos seus Follow-ups consultado com sucesso"
-                )
-        );
-    }
-
-    /**
-     * Cria o próximo Follow-up do ciclo.
-     * <p>
-     * Exemplo:
-     * <p>
-     * 1/6 → 2/6
-     * 2/6 → 3/6
-     * ...
-     * 5/6 → 6/6
-     */
     @PostMapping("/{id}/next")
     @PreAuthorize("hasAuthority('FOLLOWUP_CREATE')")
     public ResponseEntity<ApiResponse<FollowUpResponseDTO>> next(

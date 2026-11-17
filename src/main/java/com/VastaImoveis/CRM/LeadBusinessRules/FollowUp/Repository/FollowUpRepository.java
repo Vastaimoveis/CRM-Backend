@@ -194,4 +194,49 @@ public interface FollowUpRepository extends JpaRepository<FollowUp, UUID> {
             @Param("inicioDeHoje") LocalDateTime inicioDeHoje,
             @Param("inicioDeAmanha") LocalDateTime inicioDeAmanha
     );
+
+    @Query("""
+    SELECT new com.VastaImoveis.CRM.LeadBusinessRules.FollowUp.Entity.dto.FollowUpStatusCountDTO(
+        f.status,
+        COUNT(f)
+    )
+    FROM FollowUp f
+    WHERE f.atual = true
+      AND (:userId IS NULL OR f.lead.user.id = :userId)
+    GROUP BY f.status
+    ORDER BY f.status
+""")
+    List<FollowUpStatusCountDTO> countCurrentByStatus(
+            @Param("userId") UUID userId
+    );
+
+    @Query("""
+    SELECT COUNT(f)
+    FROM FollowUp f
+    WHERE f.atual = true
+      AND (:userId IS NULL OR f.lead.user.id = :userId)
+      AND f.status = :status
+      AND f.proximoContato < :inicioDeHoje
+""")
+    Long countAtrasados(
+            @Param("status") FollowUpStatus status,
+            @Param("inicioDeHoje") LocalDateTime inicioDeHoje,
+            @Param("userId") UUID userId
+    );
+
+    @Query("""
+    SELECT COUNT(f)
+    FROM FollowUp f
+    WHERE f.atual = true
+      AND (:userId IS NULL OR f.lead.user.id = :userId)
+      AND f.status = :status
+      AND f.proximoContato >= :inicioDeHoje
+      AND f.proximoContato < :inicioDeAmanha
+""")
+    Long countToday(
+            @Param("status") FollowUpStatus status,
+            @Param("inicioDeHoje") LocalDateTime inicioDeHoje,
+            @Param("inicioDeAmanha") LocalDateTime inicioDeAmanha,
+            @Param("userId") UUID userId
+    );
 }

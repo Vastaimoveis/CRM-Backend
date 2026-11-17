@@ -12,6 +12,7 @@ import com.VastaImoveis.CRM.UserBusinessRules.Users.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,14 +167,6 @@ public class FollowUpService {
                 .map(FollowUpMapper::toResponse);
     }
 
-
-    // Retorna a quantidade de Follow-ups atuais agrupados por status.
-// Utilizado por administradores e gerentes.
-    @Transactional(readOnly = true)
-    public List<FollowUpStatusCountDTO> countCurrentByStatus() {
-        return followUpRepository.countCurrentByStatus();
-    }
-
     // Lista somente os Follow-ups atuais do corretor autenticado.
     @Transactional(readOnly = true)
     public Page<FollowUpResponseDTO> findMyCurrent(
@@ -203,44 +196,6 @@ public class FollowUpService {
         return followUpRepository
                 .findByAtualTrueAndLead_User_Id(userId, pageable)
                 .map(FollowUpMapper::toResponse);
-    }
-
-
-    // Retorna a quantidade de Follow-ups atuais por status
-// somente para o corretor autenticado.
-    @Transactional(readOnly = true)
-    public List<FollowUpStatusCountDTO> countMyCurrentByStatus(
-            Authentication user
-    ) {
-
-        UUID userId = buscarUserIdAutenticado(user);
-
-        LocalDateTime inicioDeHoje = LocalDate.now().atStartOfDay();
-
-        // Busca a contagem original agrupada por status
-        List<FollowUpStatusCountDTO> counts =
-                followUpRepository.countCurrentByStatusAndUser(userId);
-
-        // Conta os pendentes que estão atrasados
-        Long pendentesAtrasados = followUpRepository.countAtrasadosByUser(
-                userId,
-                FollowUpStatus.PENDENTE,
-                inicioDeHoje
-        );
-
-        // Conta os reagendados que estão atrasados
-        Long reagendadosAtrasados = followUpRepository.countAtrasadosByUser(
-                userId,
-                FollowUpStatus.REAGENDADO,
-                inicioDeHoje
-        );
-
-        // Reconstrói as quantidades com os status efetivos
-        return calcularStatusEfetivos(
-                counts,
-                pendentesAtrasados,
-                reagendadosAtrasados
-        );
     }
 
     // Conclui o contato e salva o atraso histórico.
@@ -467,30 +422,6 @@ public class FollowUpService {
         return resultado.map(FollowUpMapper::toResponse);
     }
 
-
-    @Transactional(readOnly = true)
-    public FollowUpSummaryDTO getMySummary(Authentication authentication) {
-
-        UUID userId = buscarUserIdAutenticado(authentication);
-
-        LocalDate hoje = LocalDate.now();
-
-        LocalDateTime inicioDeHoje = hoje.atStartOfDay();
-        LocalDateTime inicioDeAmanha = hoje.plusDays(1).atStartOfDay();
-
-        List<FollowUpStatusCountDTO> counts =
-                countMyCurrentByStatus(authentication);
-
-        Long todayCount = followUpRepository.countTodayByUser(
-                userId,
-                FollowUpStatus.PENDENTE,
-                inicioDeHoje,
-                inicioDeAmanha
-        );
-
-        return FollowUpMapper.toSummaryDTO(counts, todayCount);
-    }
-
     @Transactional
     public FollowUpResponseDTO cancelar(UUID id) {
 
@@ -561,7 +492,41 @@ public class FollowUpService {
     }
 
     @Transactional(readOnly = true)
-    public FollowUpSummaryDTO getAllSummary() {
+    public FollowUpSummaryDTO getSummary(
+            Authentication authentication,
+            UUID requestedUserId
+    ) {
+
+        UUID authenticatedUserId = buscarUserIdAutenticado(authentication);
+
+        boolean canViewAll = authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("FOLLOWUP_VIEW_ALL")
+                );
+
+        UUID targetUserId;
+
+        if (canViewAll) {
+            // Com permissão geral:
+            // null = todos os usuários
+            // UUID = usuário específico
+            targetUserId = requestedUserId;
+
+        } else {
+            // Sem permissão geral:
+            // Não pode consultar outro usuário
+            if (requestedUserId != null &&
+                    !requestedUserId.equals(authenticatedUserId)) {
+
+                throw new AccessDeniedException(
+                        "Você não possui permissão para consultar Follow-ups de outro usuário."
+                );
+            }
+
+            // Consulta exclusivamente os próprios Follow-ups
+            targetUserId = authenticatedUserId;
+        }
 
         LocalDate hoje = LocalDate.now();
 
@@ -569,17 +534,21 @@ public class FollowUpService {
         LocalDateTime inicioDeAmanha = hoje.plusDays(1).atStartOfDay();
 
         List<FollowUpStatusCountDTO> counts =
-                followUpRepository.countCurrentByStatus();
+                followUpRepository.countCurrentByStatus(targetUserId);
 
-        Long pendentesAtrasados = followUpRepository.countAllAtrasados(
-                FollowUpStatus.PENDENTE,
-                inicioDeHoje
-        );
+        Long pendentesAtrasados =
+                followUpRepository.countAtrasados(
+                        FollowUpStatus.PENDENTE,
+                        inicioDeHoje,
+                        targetUserId
+                );
 
-        Long reagendadosAtrasados = followUpRepository.countAllAtrasados(
-                FollowUpStatus.REAGENDADO,
-                inicioDeHoje
-        );
+        Long reagendadosAtrasados =
+                followUpRepository.countAtrasados(
+                        FollowUpStatus.REAGENDADO,
+                        inicioDeHoje,
+                        targetUserId
+                );
 
         List<FollowUpStatusCountDTO> statusEfetivos =
                 calcularStatusEfetivos(
@@ -587,10 +556,12 @@ public class FollowUpService {
                         pendentesAtrasados,
                         reagendadosAtrasados
                 );
-        Long todayCount = followUpRepository.countAllToday(
+
+        Long todayCount = followUpRepository.countToday(
                 FollowUpStatus.PENDENTE,
                 inicioDeHoje,
-                inicioDeAmanha
+                inicioDeAmanha,
+                targetUserId
         );
 
         return FollowUpMapper.toSummaryDTO(
